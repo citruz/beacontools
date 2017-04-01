@@ -62,8 +62,8 @@ setup(
         'dev': ['check-manifest'],
         'test': [
             'coverage==4.3.4',
-            'flake8==3.3.0'
-            'pydocstyle==1.1.1'
+            'flake8==3.3.0',
+            'pydocstyle==1.1.1',
         ],
     },
 )
