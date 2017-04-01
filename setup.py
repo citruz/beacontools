@@ -14,7 +14,7 @@ setup(
 
     version='0.0.1',
 
-    description='A Python Library for working with various types of Bluetooth LE Beacons.',
+    description='A Python library for working with various types of Bluetooth LE Beacons.',
     long_description=long_description,
 
     url='https://github.com/citruz/beacontools',
