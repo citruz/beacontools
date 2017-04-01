@@ -52,7 +52,7 @@ setup(
     # your project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    #install_requires=['peppercorn'],
+    # install_requires=['peppercorn'],
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,
@@ -61,9 +61,11 @@ setup(
     extras_require={
         'dev': ['check-manifest'],
         'test': [
-            'coverage==4.3.4',
+            'coveralls==1.1',
             'flake8==3.3.0',
             'pydocstyle==1.1.1',
+            'pytest==3.0.7',
+            'pytest-cov==2.4.0',
         ],
     },
 )

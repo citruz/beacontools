@@ -1,0 +1,4 @@
+[MASTER]
+reports=no
+
+max-line-length=100
