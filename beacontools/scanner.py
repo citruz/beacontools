@@ -1,8 +1,15 @@
+"""Classes responsible for Beacon scanning."""
 import threading
-import struct
 import logging
 
 import bluetooth._bluetooth as bluez
+
+from .parser import parse_packet
+from .utils import bt_addr_to_string
+from .packet_types import EddystoneUIDFrame, EddystoneURLFrame, \
+                          EddystoneEncryptedTLMFrame, EddystoneTLMFrame
+from .device_filters import BtAddrFilter, DeviceFilter
+from .utils import is_packet_type, is_one_of
 
 LE_META_EVENT = 0x3e
 OGF_LE_CTL = 0x08
@@ -12,49 +19,48 @@ EVT_LE_ADVERTISING_REPORT = 0x02
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.setLevel(logging.DEBUG)
 
-class BeaconScanner():
+# pylint: disable=no-member
+
+class BeaconScanner(object):
     """Scan for Beacon advertisements."""
 
-    def __init__(self, bt_device_id=0, device_filter=None, packet_filter=None):
+    def __init__(self, callback, bt_device_id=0, device_filter=None, packet_filter=None):
         """Initialize scanner."""
-        self._mon = Monitor(bt_device_id, device_filter, packet_filter)
+        # check if device filters are valid
+        if device_filter is not None:
+            if not isinstance(device_filter, list):
+                device_filter = [device_filter]
+            for filtr in device_filter:
+                if not isinstance(filtr, DeviceFilter):
+                    raise ValueError("Device filters must be instances of DeviceFilter")
 
-    @property
-    def bt_device_id(self):
-        return self._mon.bt_device_id
+        # check if packet filters are valid
+        if packet_filter is not None:
+            if not isinstance(packet_filter, list):
+                packet_filter = [packet_filter]
+            for filtr in packet_filter:
+                if not is_packet_type(filtr):
+                    raise ValueError("Packet filters must be one of the packet types")
 
-    @property
-    def device_filter(self):
-        return self._mon.device_filter
-
-    @device_filter.setter
-    def device_filter(self, value):
-        # TODO check wether it is a list and all are beacons
-        self._mon.device_filter = value
-
-    @property
-    def packet_filter(self):
-        return self._mon.packet_filter
-
-    @packet_filter.setter
-    def packet_filter(self, value):
-        # TODO check wether it is a list and all are packet types
-        self._mon.packet_filter = value
+        self._mon = Monitor(callback, bt_device_id, device_filter, packet_filter)
 
     def start(self):
+        """Start beacon scanning."""
         self._mon.start()
 
     def stop(self):
+        """Stop beacon scanning."""
         self._mon.terminate()
 
 class Monitor(threading.Thread):
     """Continously scan for BLE advertisements."""
 
-    def __init__(self, bt_device_id, device_filter, packet_filter):
+    def __init__(self, callback, bt_device_id, device_filter, packet_filter):
         """Construct interface object."""
         threading.Thread.__init__(self)
         self.daemon = False
         self.keep_going = True
+        self.callback = callback
 
         # number of the bt device (hciX)
         self.bt_device_id = bt_device_id
@@ -64,34 +70,27 @@ class Monitor(threading.Thread):
         self.packet_filter = packet_filter
         # bluetooth socket
         self.socket = None
+        # keep track of Eddystone Beacon <-> bt addr mapping
+        self.eddystone_mappings = []
 
     def run(self):
         """Continously scan for BLE advertisements."""
         self.socket = bluez.hci_open_dev(self.bt_device_id)
+
+        filtr = bluez.hci_filter_new()
+        bluez.hci_filter_all_events(filtr)
+        bluez.hci_filter_set_ptype(filtr, bluez.HCI_EVENT_PKT)
+        self.socket.setsockopt(bluez.SOL_HCI, bluez.HCI_FILTER, filtr)
+
         self.toggle_scan(True)
 
-        try:
-            filtr = bluez.hci_filter_new()
-            bluez.hci_filter_all_events(filtr)
-            bluez.hci_filter_set_ptype(filtr, bluez.HCI_EVENT_PKT)
-            self.socket.setsockopt(bluez.SOL_HCI, bluez.HCI_FILTER, filtr)
-
-            _LOGGER.debug("Scanner started")
-
-            while self.keep_going:
-
-                pkt = self.socket.recv(255)
-                event = pkt[1]
-                subevent = pkt[3]
-                if event == LE_META_EVENT and subevent == EVT_LE_ADVERTISING_REPORT:
-                    # we have an BLE advertisement
-                    self.process_packet(pkt)
-        except:
-            _LOGGER.error("Exception while scanning for beacons", exc_info=True)
-            raise
-        finally:
-            _LOGGER.debug("Stopped scanner")
-            self.toggle_scan(False)
+        while self.keep_going:
+            pkt = self.socket.recv(255)
+            event = pkt[1]
+            subevent = pkt[3]
+            if event == LE_META_EVENT and subevent == EVT_LE_ADVERTISING_REPORT:
+                # we have an BLE advertisement
+                self.process_packet(pkt)
 
     def toggle_scan(self, enable):
         """Enable and disable BLE scanning."""
@@ -102,92 +101,80 @@ class Monitor(threading.Thread):
         bluez.hci_send_cmd(self.socket, OGF_LE_CTL, OCF_LE_SET_SCAN_ENABLE, command)
 
     def process_packet(self, pkt):
-        """Process an BLE advertisement packet.
-        First, we look for the unique ID which identifies Eddystone beacons.
-        All other packets will be ignored. We then filter for UID and TLM
-        frames. See https://github.com/google/eddystone/ for reference.
-        If we find an UID frame the namespace and instance identifier are
-        extracted and compared againt the user-supplied values.
-        If there is a match, the bluetooth address associated to the
-        advertisement will be saved. This is necessary to identify the TLM
-        frames sent by this beacon as they do not contain the namespace and
-        instance identifier.
-        If we encounter an TLM frame, we check if the bluetooth address
-        belongs to the beacon monitored. If yes, we can finally extract the
-        temperature.
-        """
-        bt_addr = pkt[7:13]
+        """Parse the packet and call callback if one of the filters matches."""
 
-        # strip bluetooth address and start parsing "length-type-value"
-        # structure
-        pkt = pkt[14:]
-        for type_, data in self.parse_structure(pkt):
-            # type 0x16: service data, 0xaa 0xfe: eddystone UUID
-            if type_ == 0x16 and data[:2] == b"\xaa\xfe":
-                # found eddystone beacon
-                if data[2] == 0x00:
-                    # UID frame
-                    # need to extract namespace and instance
-                    # and compare them against target value
-                    namespace = data[4:14]
-                    instance = data[14:20]
+        # check if this is an eddystone packet before parsing
+        # this reduces the CPU load significantly
+        if pkt[19:21] != b"\xaa\xfe":
+            return
 
-                    device = self.match_device(namespace, instance, bt_addr)
-                    if device is not None:
-                        # found bt address of monitored beacon
-                        _LOGGER.debug("Found beacon at new address: %s",
-                                      binascii.hexlify(bt_addr))
-                        device.bt_addr = bt_addr
+        bt_addr = bt_addr_to_string(pkt[7:13])
+        # strip bluetooth address and parse packet
+        packet = parse_packet(pkt[14:])
 
-                elif data[2] == 0x20:
-                    device = self.match_device_by_addr(bt_addr)
-                    if device is not None:
-                        # TLM frame from target beacon
-                        temp = struct.unpack("<H", data[6:8])[0]
-                        _LOGGER.debug("Received temperature for %s: %d",
-                                      device.name, temp)
-                        device.temperature = temp
+        # return if packet was not an beacon advertisement
+        if not packet:
+            return
 
-    def match_device(self, namespace, instance, bt_addr):
-        """Find beacon in device list.
-        Interates device list for beacon with supplied namespace
-        and instance id. Returns object only if bluetooth address is
-        different.
-        """
-        for dev in self.devices:
-            if dev.namespace == namespace and dev.instance == instance \
-                    and (dev.bt_addr is None or dev.bt_addr != bt_addr):
-                return dev
 
+        # we need to remeber which eddystone beacon has which bt address
+        # because the TLM and URL frames do not contain the namespace and instance
+        self.save_bt_addr(packet, bt_addr)
+        # properties holds the identifying information for a beacon
+        # e.g. instance and namespace for eddystone; uuid, major, minor for iBeacon
+        properties = self.get_properties(packet, bt_addr)
+
+        if self.device_filter is None and self.packet_filter is None:
+            # no filters selected
+            self.callback(bt_addr, packet, properties)
+
+        elif self.device_filter is None:
+            # filter by packet type
+            if is_one_of(packet, self.packet_filter):
+                self.callback(bt_addr, packet, properties)
+        else:
+            # filter by device and packet type
+            if self.packet_filter and not is_one_of(packet, self.packet_filter):
+                # return if packet filter does not match
+                return
+
+            # iterate over filters and call .matches() on each
+            for filtr in self.device_filter:
+                if isinstance(filtr, BtAddrFilter):
+                    if filtr.matches({'bt_addr':bt_addr}):
+                        self.callback(bt_addr, packet, properties)
+                        return
+
+                elif filtr.matches(properties):
+                    self.callback(bt_addr, packet, properties)
+                    return
+
+    def save_bt_addr(self, packet, bt_addr):
+        """Add to the list of mappings."""
+        if isinstance(packet, EddystoneUIDFrame):
+            # remove out old mapping
+            new_mappings = [m for m in self.eddystone_mappings if m[0] != bt_addr]
+            new_mappings.append((bt_addr, packet.properties))
+            self.eddystone_mappings = new_mappings
+
+    def get_properties(self, packet, bt_addr):
+        """Get properties of beacon depending on type."""
+        if is_one_of(packet, [EddystoneTLMFrame, EddystoneURLFrame, EddystoneEncryptedTLMFrame]):
+            # here we retrieve the namespace and instance which corresponds to the
+            # eddystone beacon with this bt address
+            return self.properties_from_mapping(bt_addr)
+        else:
+            return packet.properties
+
+    def properties_from_mapping(self, bt_addr):
+        """Retrieve properties (namespace, instance) for the specified bt address."""
+        for addr, properties in self.eddystone_mappings:
+            if addr == bt_addr:
+                return properties
         return None
-
-    def match_device_by_addr(self, bt_addr):
-        """Find beacon in device list.
-        Searches device list for beacon with the supplied bluetooth
-        address.
-        """
-        for dev in self.devices:
-            if dev.bt_addr == bt_addr:
-                return dev
-        return None
-
-    @staticmethod
-    def parse_structure(data):
-        """Generator to parse the eddystone packet structure.
-        | length | type |     data       |
-        | 1 byte |1 byte| length-1 bytes |
-        """
-        while data:
-            try:
-                length, type_ = struct.unpack("BB", data[:2])
-                value = data[2:1+length]
-            except struct.error:
-                break
-
-            yield type_, value
-            data = data[1+length:]
 
     def terminate(self):
         """Signal runner to stop and join thread."""
+        self.toggle_scan(False)
         self.keep_going = False
         self.join()

@@ -1,6 +1,4 @@
 """Beacon advertisement parser."""
-import traceback
-
 from construct import ConstructError
 
 from .structs import EddystoneFrame
@@ -30,7 +28,6 @@ def parse_packet(packet):
                     return EddystoneURLFrame(data['frame'])
 
     except ConstructError:
-        traceback.print_exc()
         return None
 
     return None

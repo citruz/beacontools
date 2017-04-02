@@ -1,4 +1,6 @@
 [MASTER]
 reports=no
 
+disable=too-many-instance-attributes,too-few-public-methods,too-many-branches,locally-disabled,fixme
+
 max-line-length=100

@@ -25,6 +25,11 @@ class EddystoneUIDFrame(object):
         """6-byte instance identifier."""
         return self._instance
 
+    @property
+    def properties(self):
+        """Get beacon properties."""
+        return {'namespace': self.namespace, 'instance': self.instance}
+
     def __str__(self):
         return "EddystoneUIDFrame<tx_power: %d, namespace: %s, instance: %s>" \
                % (self.tx_power, self.namespace, self.instance)
