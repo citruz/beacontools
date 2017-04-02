@@ -2,7 +2,9 @@
 
 class DeviceFilter(object):
     """Base class for all device filters. Should not be used by itself."""
+
     def __init__(self):
+        """Initialize filter."""
         self.properties = {}
 
     def matches(self, filter_props):
@@ -18,7 +20,9 @@ class DeviceFilter(object):
 
 class IBeaconFilter(DeviceFilter):
     """Filter for iBeacon."""
+
     def __init__(self, uuid=None, major=None, minor=None):
+        """Initialize filter."""
         super(IBeaconFilter, self).__init__()
         # TODO validate arguments
         if uuid:
@@ -30,7 +34,9 @@ class IBeaconFilter(DeviceFilter):
 
 class EddystoneFilter(DeviceFilter):
     """Filter for Eddystone beacons."""
+
     def __init__(self, namespace=None, instance=None):
+        """Initialize filter."""
         super(EddystoneFilter, self).__init__()
         # TODO validate arguments
         if namespace:
@@ -40,7 +46,9 @@ class EddystoneFilter(DeviceFilter):
 
 class BtAddrFilter(DeviceFilter):
     """Filter by bluetooth address."""
+
     def __init__(self, bt_addr):
+        """Initialize filter."""
         super(BtAddrFilter, self).__init__()
         # TODO validate arguments
         self.properties['bt_addr'] = bt_addr

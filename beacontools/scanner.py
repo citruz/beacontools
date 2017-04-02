@@ -102,7 +102,6 @@ class Monitor(threading.Thread):
 
     def process_packet(self, pkt):
         """Parse the packet and call callback if one of the filters matches."""
-
         # check if this is an eddystone packet before parsing
         # this reduces the CPU load significantly
         if pkt[19:21] != b"\xaa\xfe":

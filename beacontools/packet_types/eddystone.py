@@ -5,6 +5,7 @@ from ..utils import data_to_hexstring, data_to_binstring
 
 class EddystoneUIDFrame(object):
     """Eddystone UID frame."""
+
     def __init__(self, data):
         self._tx_power = data['tx_power']
         self._namespace = data_to_hexstring(data['namespace'])
@@ -37,6 +38,7 @@ class EddystoneUIDFrame(object):
 
 class EddystoneURLFrame(object):
     """Eddystone URL frame."""
+
     def __init__(self, data):
         self._tx_power = data['tx_power']
         url_scheme = EDDYSTONE_URL_SCHEMES[data['url_scheme']]
@@ -65,6 +67,7 @@ class EddystoneURLFrame(object):
 
 class EddystoneEncryptedTLMFrame(object):
     """Eddystone encrypted TLM frame."""
+
     def __init__(self, data):
         self._encrypted_data = data_to_binstring(data['encrypted_data'])
         self._salt = data['salt']
@@ -92,6 +95,7 @@ class EddystoneEncryptedTLMFrame(object):
 
 class EddystoneTLMFrame(object):
     """Eddystone TLM frame."""
+
     def __init__(self, data):
         self._voltage = data['voltage']
         self._temperature = data['temperature']
