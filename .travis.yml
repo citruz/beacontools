@@ -15,6 +15,9 @@ matrix:
 cache:
   directories:
     - $HOME/.cache/pip
+before_install:
+  - sudo apt-get -qq update
+  - sudo apt-get install -y libbluetooth-dev 
 install: pip install -U tox coveralls
 language: python
 script: tox
