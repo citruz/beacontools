@@ -13,6 +13,7 @@ print("-----")
 # Eddystone URL packet
 url_packet = b"\x03\x03\xAA\xFE\x13\x16\xAA\xFE\x10\xF8\x03github\x00citruz"
 url_frame = parse_packet(url_packet)
+print("TX Power: %d" % url_frame.tx_power)
 print("URL: %s" % url_frame.url)
 
 print("-----")

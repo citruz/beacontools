@@ -1,23 +1,28 @@
+"""Constants."""
+
+# for eddystone
 FLAGS_DATA_TYPE = 0x01
 SERVICE_UUIDS_DATA_TYPE = 0x03
 SERVICE_DATA_TYPE = 0x16
 
 EDDYSTONE_UUID = b"\xaa\xfe"
 
-UID_FRAME = 0x00
-URL_FRAME = 0x10
-TLM_FRAME = 0x20
-EID_FRAME = 0x20
-RESERVED_FRAME = 0x20
+EDDYSTONE_UID_FRAME = 0x00
+EDDYSTONE_URL_FRAME = 0x10
+EDDYSTONE_TLM_FRAME = 0x20
+EDDYSTONE_EID_FRAME = 0x20
+EDDYSTONE_RESERVED_FRAME = 0x20
+EDDYSTONE_TLM_UNENCRYPTED = 0x00
+EDDYSTONE_TLM_ENCRYPTED = 0x01
 
-URL_SCHEMES = {
+EDDYSTONE_URL_SCHEMES = {
     0x00: "http://www.",
     0x01: "https://www.",
     0x02: "http://",
     0x03: "https://",
 }
 
-TLD_ENCODINGS = {
+EDDYSTONE_TLD_ENCODINGS = {
     0x00: ".com/",
     0x01: ".org/",
     0x02: ".edu/",
@@ -33,6 +38,3 @@ TLD_ENCODINGS = {
     0x0c: ".biz",
     0x0d: ".gov",
 }
-
-TLM_UNENCRYPTED = 0x00
-TLM_ENCRYPTED = 0x01

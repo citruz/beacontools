@@ -1,6 +1,6 @@
 """Setup module for beacontools."""
 
-from setuptools import setup, find_packages
+from setuptools import setup
 from codecs import open
 from os import path
 

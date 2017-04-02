@@ -11,5 +11,6 @@ __pycache__/
 venv/
 
 # due to using tox and pytest
+.coverage
 .tox
 .cache
