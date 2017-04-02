@@ -12,7 +12,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 setup(
     name='beacontools',
 
-    version='0.0.1',
+    version='0.1',
 
     description='A Python library for working with various types of Bluetooth LE Beacons.',
     long_description=long_description,
@@ -53,7 +53,6 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
-        'PyBluez==0.22',
         'construct==2.8.10'
     ],
 
@@ -62,6 +61,7 @@ setup(
     # for example:
     # $ pip install -e .[dev,test]
     extras_require={
+        'scan': ['PyBluez==0.22'],
         'dev': ['check-manifest'],
         'test': [
             'coveralls==1.1',
