@@ -1,16 +1,14 @@
 # -*- coding: utf-8 -*-
 """Packet classes for Eddystone beacons."""
-from binascii import hexlify
-
 from ..const import EDDYSTONE_URL_SCHEMES, EDDYSTONE_TLD_ENCODINGS
-
+from ..utils import data_to_hexstring, data_to_binstring
 
 class EddystoneUIDFrame(object):
     """Eddystone UID frame."""
     def __init__(self, data):
         self._tx_power = data['tx_power']
-        self._namespace = hexlify(bytes(data['namespace'])).decode('ascii')
-        self._instance = hexlify(bytes(data['instance'])).decode('ascii')
+        self._namespace = data_to_hexstring(data['namespace'])
+        self._instance = data_to_hexstring(data['instance'])
 
     @property
     def tx_power(self):
@@ -63,7 +61,7 @@ class EddystoneURLFrame(object):
 class EddystoneEncryptedTLMFrame(object):
     """Eddystone encrypted TLM frame."""
     def __init__(self, data):
-        self._encrypted_data = bytes(data['encrypted_data'])
+        self._encrypted_data = data_to_binstring(data['encrypted_data'])
         self._salt = data['salt']
         self._mic = data['mic']
 

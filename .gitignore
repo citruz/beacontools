@@ -9,6 +9,7 @@ __pycache__/
 *~
 .DS_Store
 venv/
+venv27/
 
 # due to using tox and pytest
 .coverage

@@ -70,4 +70,4 @@ LTV = Struct(
                     ),
 )
 
-EddystoneFrame = LTV[:]
+EddystoneFrame = LTV[2:]
