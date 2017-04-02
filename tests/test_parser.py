@@ -34,6 +34,7 @@ class TestParser(unittest.TestCase):
         self.assertEqual(frame.namespace, "12345678901234678901")
         self.assertEqual(frame.instance, "000000000001")
         self.assertEqual(frame.tx_power, -29)
+        self.assertIsNotNone(str(frame))
 
     def test_eddystone_url(self):
         """Test URL frame."""
@@ -43,6 +44,7 @@ class TestParser(unittest.TestCase):
         self.assertIsInstance(frame, EddystoneURLFrame)
         self.assertEqual(frame.url, "https://github.com/citruz")
         self.assertEqual(frame.tx_power, -8)
+        self.assertIsNotNone(str(frame))
 
     def test_eddystone_tlm(self):
         """Test TLM frame."""
@@ -54,6 +56,7 @@ class TestParser(unittest.TestCase):
         self.assertEqual(frame.temperature, 19)
         self.assertEqual(frame.advertising_count, 5223)
         self.assertEqual(frame.seconds_since_boot, 10948)
+        self.assertIsNotNone(str(frame))
 
     def test_eddystone_tlm_enc(self):
         """Test encrypted TLM frame."""
@@ -64,3 +67,4 @@ class TestParser(unittest.TestCase):
         self.assertEqual(frame.encrypted_data, b'AAAAAAAAAAAA')
         self.assertEqual(frame.salt, 44510)
         self.assertEqual(frame.mic, 65470)
+        self.assertIsNotNone(str(frame))
