@@ -7,6 +7,7 @@ uid_packet = b"\x02\x01\x06\x03\x03\xaa\xfe\x17\x16\xaa\xfe\x00\xe3\x12\x34\x56\
 uid_frame = parse_packet(uid_packet)
 print("Namespace: %s" % uid_frame.namespace)
 print("Instance: %s" % uid_frame.instance)
+print("TX Power: %s" % uid_frame.tx_power)
 
 print("-----")
 

@@ -33,6 +33,7 @@ class TestParser(unittest.TestCase):
         self.assertIsInstance(frame, EddystoneUIDFrame)
         self.assertEqual(frame.namespace, "12345678901234678901")
         self.assertEqual(frame.instance, "000000000001")
+        self.assertEqual(frame.tx_power, -29)
 
     def test_eddystone_url(self):
         """Test URL frame."""
