@@ -8,6 +8,7 @@ __pycache__/
 *.so
 *~
 .DS_Store
+venv/
 
 # due to using tox and pytest
 .tox

@@ -42,7 +42,7 @@ setup(
 
     keywords='beacons ibeacon eddystone bluetooth low energy ble',
 
-    packages=find_packages(exclude=['contrib', 'docs', 'tests']),
+    packages=['beacontools'],
 
     # Alternatively, if you want to distribute just a my_module.py, uncomment
     # this:
@@ -52,7 +52,10 @@ setup(
     # your project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    # install_requires=['peppercorn'],
+    install_requires=[
+        'PyBluez==0.22',
+        'construct==2.8.10'
+    ],
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,
