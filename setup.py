@@ -1,6 +1,6 @@
 """Setup module for beacontools."""
 
-from setuptools import setup
+from setuptools import setup, find_packages
 from codecs import open
 from os import path
 
@@ -12,7 +12,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 setup(
     name='beacontools',
 
-    version='0.1',
+    version='0.1.2',
 
     description='A Python library for working with various types of Bluetooth LE Beacons.',
     long_description=long_description,
@@ -42,7 +42,7 @@ setup(
 
     keywords='beacons ibeacon eddystone bluetooth low energy ble',
 
-    packages=['beacontools'],
+    packages=find_packages(exclude=['contrib', 'docs', 'tests']),
 
     # Alternatively, if you want to distribute just a my_module.py, uncomment
     # this:
