@@ -22,8 +22,8 @@ class TestUtils(unittest.TestCase):
     def test_data_to_binstring(self):
         """Verify that data is converted correctly."""
         tests = [
-            ([0x41, 0x42, 0x43], "\x41\x42\x43"),
-            ([], "")
+            ([0x41, 0x42, 0x43], b"\x41\x42\x43"),
+            ([], b"")
         ]
 
         for data, hexstring in tests:
