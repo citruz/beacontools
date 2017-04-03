@@ -65,10 +65,10 @@ setup(
         'dev': ['check-manifest'],
         'test': [
             'coveralls==1.1',
-            'flake8==3.3.0',
-            'pydocstyle==1.1.1',
             'pytest==3.0.7',
             'pytest-cov==2.4.0',
+            'check-manifest==0.35',
+            'pylint==1.6.5',
         ],
     },
 )
