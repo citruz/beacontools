@@ -37,3 +37,14 @@ enc_tlm_frame = parse_packet(enc_tlm_packet)
 print("Data: %s" % enc_tlm_frame.encrypted_data)
 print("Salt: %d" % enc_tlm_frame.salt)
 print("Mic: %d" % enc_tlm_frame.mic)
+
+print("-----")
+
+# iBeacon Advertisement
+ibeacon_packet = b"\x02\x01\x06\x1a\xff\x4c\x00\x02\x15\x41\x41\x41\x41\x41\x41\x41\x41\x41" \
+                 b"\x41\x41\x41\x41\x41\x41\x41\x00\x01\x00\x01\xf8"
+adv = parse_packet(ibeacon_packet)
+print("UUID: %s" % adv.uuid)
+print("Major: %d" % adv.major)
+print("Minor: %d" % adv.minor)
+print("TX Power: %d" % adv.tx_power)

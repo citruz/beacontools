@@ -12,11 +12,14 @@ class DeviceFilter(object):
         if filter_props is None:
             return False
 
+        found_one = False
         for key, value in filter_props.items():
             if key in self.properties and value != self.properties[key]:
                 return False
+            elif key in self.properties and value == self.properties[key]:
+                found_one = True
 
-        return True
+        return found_one
 
 class IBeaconFilter(DeviceFilter):
     """Filter for iBeacon."""

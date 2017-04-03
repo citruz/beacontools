@@ -9,7 +9,7 @@ from .utils import bt_addr_to_string
 from .packet_types import EddystoneUIDFrame, EddystoneURLFrame, \
                           EddystoneEncryptedTLMFrame, EddystoneTLMFrame
 from .device_filters import BtAddrFilter, DeviceFilter
-from .utils import is_packet_type, is_one_of, to_int
+from .utils import is_packet_type, is_one_of, to_int, bin_to_int
 
 LE_META_EVENT = 0x3e
 OGF_LE_CTL = 0x08
@@ -108,14 +108,15 @@ class Monitor(threading.Thread):
 
     def process_packet(self, pkt):
         """Parse the packet and call callback if one of the filters matches."""
-        # check if this is an eddystone packet before parsing
+        # check if this could be a valid packet before parsing
         # this reduces the CPU load significantly
-        if pkt[19:21] != b"\xaa\xfe":
+        if (pkt[19:21] != b"\xaa\xfe") and (pkt[19:21] != b"\x4c\x00"):
             return
 
         bt_addr = bt_addr_to_string(pkt[7:13])
+        rssi = bin_to_int(pkt[-1])
         # strip bluetooth address and parse packet
-        packet = parse_packet(pkt[14:])
+        packet = parse_packet(pkt[14:-1])
 
         # return if packet was not an beacon advertisement
         if not packet:
@@ -131,12 +132,12 @@ class Monitor(threading.Thread):
 
         if self.device_filter is None and self.packet_filter is None:
             # no filters selected
-            self.callback(bt_addr, packet, properties)
+            self.callback(bt_addr, rssi, packet, properties)
 
         elif self.device_filter is None:
             # filter by packet type
             if is_one_of(packet, self.packet_filter):
-                self.callback(bt_addr, packet, properties)
+                self.callback(bt_addr, rssi, packet, properties)
         else:
             # filter by device and packet type
             if self.packet_filter and not is_one_of(packet, self.packet_filter):
@@ -147,11 +148,11 @@ class Monitor(threading.Thread):
             for filtr in self.device_filter:
                 if isinstance(filtr, BtAddrFilter):
                     if filtr.matches({'bt_addr':bt_addr}):
-                        self.callback(bt_addr, packet, properties)
+                        self.callback(bt_addr, rssi, packet, properties)
                         return
 
                 elif filtr.matches(properties):
-                    self.callback(bt_addr, packet, properties)
+                    self.callback(bt_addr, rssi, packet, properties)
                     return
 
     def save_bt_addr(self, packet, bt_addr):

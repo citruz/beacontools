@@ -1,13 +1,13 @@
 BeaconTools - Universal beacon scanning
 =======================================
-|Build Status| |Coverage Status|
+|Build Status| |Coverage Status| |Requirements Status|
 
 A Python library for working with various types of Bluetooth LE Beacons.
 
 Currently supported types are:
 
 * `Eddystone Beacons <https://github.com/google/eddystone/>`__
-* `Apple iBeacons <https://developer.apple.com/ibeacon/>`__ (coming soon)
+* `Apple iBeacons <https://developer.apple.com/ibeacon/>`__ 
 
 The BeaconTools library has two main components:
 
@@ -56,10 +56,12 @@ Scanner
 ~~~~~~~
 .. code:: python
 
+    import time
     from beacontools import BeaconScanner, EddystoneTLMFrame, EddystoneFilter
 
-    def callback(bt_addr, packet, additional_info):
-        print("<%s> %s %s" % (bt_addr, packet, additional_info))
+    def callback(bt_addr, rssi, packet, additional_info):
+        print("<%s, %d> %s %s" % (bt_addr, rssi, packet, additional_info))
+
     # scan for all TLM frames of beacons in the namespace "12345678901234678901"
     scanner = BeaconScanner(callback, 
         device_filter=EddystoneFilter(namespace="12345678901234678901"),
@@ -67,14 +69,39 @@ Scanner
     )
     scanner.start()
 
+    time.sleep(10)
+    scanner.stop()
+
+
+.. code:: python
+
+    import time
+    from beacontools import BeaconScanner, IBeaconFilter
+
+    def callback(bt_addr, rssi, packet, additional_info):
+        print("<%s, %d> %s %s" % (bt_addr, rssi, packet, additional_info))
+
+    # scan for all iBeacon advertisements from beacons with the specified uuid 
+    scanner = BeaconScanner(callback, 
+        device_filter=IBeaconFilter(uuid="e5b9e3a6-27e2-4c36-a257-7698da5fc140")
+    )
+    scanner.start()
+    time.sleep(5)
+    scanner.stop()
+
 
 Changelog
 ---------
-
-* 0.1.2 - Initial release
+* 1.0.0 
+    * Implemented iBeacon support
+    * Added rssi to callback function.
+* 0.1.2 
+    * Initial release
 
 
 .. |Build Status| image:: https://travis-ci.org/citruz/beacontools.svg?branch=master
     :target: https://travis-ci.org/citruz/beacontools
 .. |Coverage Status| image:: https://coveralls.io/repos/github/citruz/beacontools/badge.svg?branch=master
   :target: https://coveralls.io/github/citruz/beacontools?branch=master
+.. |Requirements Status| image:: https://requires.io/github/citruz/beacontools/requirements.svg?branch=master
+  :target: https://requires.io/github/citruz/beacontools/requirements/?branch=master

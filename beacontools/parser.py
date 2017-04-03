@@ -1,15 +1,22 @@
 """Beacon advertisement parser."""
 from construct import ConstructError
 
-from .structs import EddystoneFrame
+from .structs import EddystoneFrame, IBeaconAdvertisingPacket
 from .packet_types import EddystoneUIDFrame, EddystoneURLFrame, EddystoneEncryptedTLMFrame, \
-                          EddystoneTLMFrame
+                          EddystoneTLMFrame, IBeaconAdvertisement
 from .const import EDDYSTONE_TLM_UNENCRYPTED, EDDYSTONE_TLM_ENCRYPTED, SERVICE_DATA_TYPE, \
                    EDDYSTONE_UID_FRAME, EDDYSTONE_TLM_FRAME, EDDYSTONE_URL_FRAME
 
 
 def parse_packet(packet):
     """Parse a beacon advertisement packet."""
+    frame = parse_eddystone_packet(packet)
+    if frame is None:
+        frame = parse_ibeacon_packet(packet)
+    return frame
+
+def parse_eddystone_packet(packet):
+    """Parse an eddystone beacon advertisement packet."""
     try:
         frame = EddystoneFrame.parse(packet)
         for tlv in frame:
@@ -31,3 +38,12 @@ def parse_packet(packet):
         return None
 
     return None
+
+def parse_ibeacon_packet(packet):
+    """Parse an ibeacon beacon advertisement packet."""
+    try:
+        pkt = IBeaconAdvertisingPacket.parse(packet)
+        return IBeaconAdvertisement(pkt)
+
+    except ConstructError:
+        return None

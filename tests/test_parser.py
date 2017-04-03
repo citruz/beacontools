@@ -2,7 +2,7 @@
 import unittest
 
 from beacontools import parse_packet, EddystoneUIDFrame, EddystoneURLFrame, \
-                        EddystoneEncryptedTLMFrame, EddystoneTLMFrame
+                        EddystoneEncryptedTLMFrame, EddystoneTLMFrame, IBeaconAdvertisement
 
 class TestParser(unittest.TestCase):
     """Test the parser."""
@@ -71,4 +71,16 @@ class TestParser(unittest.TestCase):
         self.assertEqual(frame.encrypted_data, b'AAAAAAAAAAAA')
         self.assertEqual(frame.salt, 44510)
         self.assertEqual(frame.mic, 65470)
+        self.assertIsNotNone(str(frame))
+
+    def test_ibeacon(self):
+        """Test iBeacon advertisement."""
+        ibeacon_packet = b"\x02\x01\x06\x1a\xff\x4c\x00\x02\x15\x41\x42\x43\x44\x45\x46\x47\x48"\
+                         b"\x49\x40\x41\x42\x43\x44\x45\x46\x00\x01\x00\x02\xf8"
+        frame = parse_packet(ibeacon_packet)
+        self.assertIsInstance(frame, IBeaconAdvertisement)
+        self.assertEqual(frame.uuid, "41424344-4546-4748-4940-414243444546")
+        self.assertEqual(frame.major, 1)
+        self.assertEqual(frame.minor, 2)
+        self.assertEqual(frame.tx_power, -8)
         self.assertIsNotNone(str(frame))

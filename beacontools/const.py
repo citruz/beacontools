@@ -38,3 +38,7 @@ EDDYSTONE_TLD_ENCODINGS = {
     0x0c: ".biz",
     0x0d: ".gov",
 }
+
+# for iBeacons
+IBEACON_COMPANY_ID = b"\x4c\x00"
+IBEACON_PROXIMITY_TPYE = b"\x02\x15"

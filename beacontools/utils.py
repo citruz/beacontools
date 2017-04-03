@@ -1,11 +1,17 @@
 """Utilities for byte conversion."""
 from binascii import hexlify
 import array
+import struct
 
 
 def data_to_hexstring(data):
     """Convert an array of binary data to the hex representation as a string."""
     return hexlify(data_to_binstring(data)).decode('ascii')
+
+def data_to_uuid(data):
+    """Convert an array of binary data to the iBeacon uuid format."""
+    string = data_to_hexstring(data)
+    return string[0:8]+'-'+string[8:12]+'-'+string[12:16]+'-'+string[16:20]+'-'+string[20:32]
 
 def data_to_binstring(data):
     """Convert an array of binary data to a binary string."""
@@ -29,9 +35,9 @@ def is_one_of(obj, types):
 def is_packet_type(cls):
     """Check if class is one the packet types."""
     from .packet_types import EddystoneUIDFrame, EddystoneURLFrame, \
-                              EddystoneEncryptedTLMFrame, EddystoneTLMFrame
+                              EddystoneEncryptedTLMFrame, EddystoneTLMFrame, IBeaconAdvertisement
     return (cls in [EddystoneURLFrame, EddystoneUIDFrame, EddystoneEncryptedTLMFrame, \
-                    EddystoneTLMFrame])
+                    EddystoneTLMFrame, IBeaconAdvertisement])
 
 def to_int(string):
     """Convert a one element byte string to int for python 2 support."""
@@ -39,3 +45,10 @@ def to_int(string):
         return ord(string[0])
     else:
         return string
+
+def bin_to_int(string):
+    """Convert a one element byte string to signed int for python 2 support."""
+    if isinstance(string, str):
+        return struct.unpack("b", string)[0]
+    else:
+        return struct.unpack("b", bytes([string]))[0]

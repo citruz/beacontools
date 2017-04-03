@@ -6,7 +6,7 @@ except ImportError:
     from mock import MagicMock
 
 from beacontools import BeaconScanner, EddystoneFilter, EddystoneTLMFrame, EddystoneUIDFrame, \
-                        BtAddrFilter
+                        BtAddrFilter, IBeaconFilter, IBeaconAdvertisement
 
 class TestScanner(unittest.TestCase):
     """Test the BeaconScanner."""
@@ -51,8 +51,9 @@ class TestScanner(unittest.TestCase):
         self.assertEqual(callback.call_count, 1)
         args = callback.call_args[0]
         self.assertEqual(args[0], "1c:d6:cd:ef:94:35")
-        self.assertIsInstance(args[1], EddystoneTLMFrame)
-        self.assertEqual(args[2], None)
+        self.assertEqual(args[1], -28)
+        self.assertIsInstance(args[2], EddystoneTLMFrame)
+        self.assertEqual(args[3], None)
 
     def test_process_packet_dev_filter(self):
         """Test processing of a packet and callback execution with device filter."""
@@ -65,8 +66,9 @@ class TestScanner(unittest.TestCase):
         self.assertEqual(callback.call_count, 1)
         args = callback.call_args[0]
         self.assertEqual(args[0], "1c:d6:cd:ef:94:35")
-        self.assertIsInstance(args[1], EddystoneUIDFrame)
-        self.assertEqual(args[2], {
+        self.assertEqual(args[1], -35)
+        self.assertIsInstance(args[2], EddystoneUIDFrame)
+        self.assertEqual(args[3], {
             "namespace":"12345678901234678901",
             "instance":"000000000001"
         })
@@ -79,6 +81,25 @@ class TestScanner(unittest.TestCase):
               b"\xfe\x11\x16\xaa\xfe\x20\x00\x0b\x18\x13\x00\x00\x00\x14\x67\x00\x00\x2a\xc4\xe4"
         scanner._mon.process_packet(pkt)
         callback.assert_not_called()
+
+    def test_process_packet_dev_filter3(self):
+        """Test processing of a packet and callback execution with ibeacon device filter."""
+        callback = MagicMock()
+        scanner = BeaconScanner(callback, device_filter=IBeaconFilter(major=1))
+        pkt = b"\x41\x3e\x41\x02\x01\x03\x01\x35\x94\xef\xcd\xd6\x1c\x19\x02\x01\x06\x1a\xff\x4c"\
+              b"\x00\x02\x15\x41\x42\x43\x44\x45\x46\x47\x48\x49\x40\x41\x42\x43\x44\x45\x46\x00"\
+              b"\x01\x00\x02\xf8\xdd"
+        scanner._mon.process_packet(pkt)
+        self.assertEqual(callback.call_count, 1)
+        args = callback.call_args[0]
+        self.assertEqual(args[0], "1c:d6:cd:ef:94:35")
+        self.assertEqual(args[1], -35)
+        self.assertIsInstance(args[2], IBeaconAdvertisement)
+        self.assertEqual(args[3], {
+            "uuid":"41424344-4546-4748-4940-414243444546",
+            "major":1,
+            "minor":2
+        })
 
     def test_process_packet_dev_packet(self):
         """Test processing of a packet and callback execution with device and packet filter."""
@@ -95,8 +116,9 @@ class TestScanner(unittest.TestCase):
         self.assertEqual(callback.call_count, 1)
         args = callback.call_args[0]
         self.assertEqual(args[0], "1c:d6:cd:ef:94:35")
-        self.assertIsInstance(args[1], EddystoneUIDFrame)
-        self.assertEqual(args[2], {
+        self.assertEqual(args[1], -35)
+        self.assertIsInstance(args[2], EddystoneUIDFrame)
+        self.assertEqual(args[3], {
             "namespace":"12345678901234678901",
             "instance":"000000000001"
         })
@@ -115,8 +137,9 @@ class TestScanner(unittest.TestCase):
         self.assertEqual(callback.call_count, 1)
         args = callback.call_args[0]
         self.assertEqual(args[0], "1c:d6:cd:ef:94:35")
-        self.assertIsInstance(args[1], EddystoneUIDFrame)
-        self.assertEqual(args[2], {
+        self.assertEqual(args[1], -35)
+        self.assertIsInstance(args[2], EddystoneUIDFrame)
+        self.assertEqual(args[3], {
             "namespace":"12345678901234678901",
             "instance":"000000000001"
         })
@@ -148,8 +171,9 @@ class TestScanner(unittest.TestCase):
         self.assertEqual(callback.call_count, 1)
         args = callback.call_args[0]
         self.assertEqual(args[0], "1c:d6:cd:ef:94:35")
-        self.assertIsInstance(args[1], EddystoneUIDFrame)
-        self.assertEqual(args[2], {
+        self.assertEqual(args[1], -35)
+        self.assertIsInstance(args[2], EddystoneUIDFrame)
+        self.assertEqual(args[3], {
             "namespace":"12345678901234678901",
             "instance":"000000000001"
         })
