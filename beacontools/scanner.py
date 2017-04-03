@@ -9,12 +9,10 @@ from .utils import bt_addr_to_string
 from .packet_types import EddystoneUIDFrame, EddystoneURLFrame, \
                           EddystoneEncryptedTLMFrame, EddystoneTLMFrame
 from .device_filters import BtAddrFilter, DeviceFilter
-from .utils import is_packet_type, is_one_of, to_int, bin_to_int
+from .utils import is_packet_type, is_one_of, to_int, bin_to_int, get_mode
+from .const import MODE_IBEACON, MODE_EDDYSTONE, LE_META_EVENT, OGF_LE_CTL, \
+                   OCF_LE_SET_SCAN_ENABLE, EVT_LE_ADVERTISING_REPORT, MODE_BOTH
 
-LE_META_EVENT = 0x3e
-OGF_LE_CTL = 0x08
-OCF_LE_SET_SCAN_ENABLE = 0x000C
-EVT_LE_ADVERTISING_REPORT = 0x02
 
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.setLevel(logging.DEBUG)
@@ -72,6 +70,7 @@ class Monitor(threading.Thread):
         self.bt_device_id = bt_device_id
         # list of beacons to monitor
         self.device_filter = device_filter
+        self.mode = get_mode(device_filter)
         # list of packet types to monitor
         self.packet_filter = packet_filter
         # bluetooth socket
@@ -110,7 +109,10 @@ class Monitor(threading.Thread):
         """Parse the packet and call callback if one of the filters matches."""
         # check if this could be a valid packet before parsing
         # this reduces the CPU load significantly
-        if (pkt[19:21] != b"\xaa\xfe") and (pkt[19:21] != b"\x4c\x00"):
+        if (self.mode == MODE_BOTH and \
+                (pkt[19:21] != b"\xaa\xfe") and (pkt[19:23] != b"\x4c\x00\x02\x15")) \
+                or (self.mode == MODE_EDDYSTONE and (pkt[19:21] != b"\xaa\xfe")) \
+                or (self.mode == MODE_IBEACON and (pkt[19:23] != b"\x4c\x00\x02\x15")):
             return
 
         bt_addr = bt_addr_to_string(pkt[7:13])
