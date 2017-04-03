@@ -1,3 +1,4 @@
+import time
 from beacontools import BeaconScanner, EddystoneTLMFrame, EddystoneFilter
 
 def callback(bt_addr, packet, additional_info):
@@ -8,3 +9,6 @@ scanner = BeaconScanner(callback,
     packet_filter=EddystoneTLMFrame
 )
 scanner.start()
+
+time.sleep(10)
+scanner.stop()

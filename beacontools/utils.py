@@ -32,3 +32,10 @@ def is_packet_type(cls):
                               EddystoneEncryptedTLMFrame, EddystoneTLMFrame
     return (cls in [EddystoneURLFrame, EddystoneUIDFrame, EddystoneEncryptedTLMFrame, \
                     EddystoneTLMFrame])
+
+def to_int(string):
+    """Convert a one element byte string to int for python 2 support."""
+    if isinstance(string, str):
+        return ord(string[0])
+    else:
+        return string

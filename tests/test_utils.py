@@ -2,7 +2,7 @@
 import unittest
 
 from beacontools.utils import data_to_hexstring, data_to_binstring, bt_addr_to_string, \
-                              is_one_of, is_packet_type
+                              is_one_of, is_packet_type, to_int
 from beacontools import EddystoneUIDFrame, EddystoneURLFrame, \
                         EddystoneEncryptedTLMFrame, EddystoneTLMFrame
 
@@ -54,3 +54,12 @@ class TestUtils(unittest.TestCase):
         ]
         for clazz, expected in tests:
             self.assertEqual(is_packet_type(clazz), expected)
+
+    def test_to_int(self):
+        """Test byte string to int conversion."""
+        tests = [
+            ("\x41", 0x41),
+            (0x41, 0x41),
+        ]
+        for string, expected in tests:
+            self.assertEqual(to_int(string), expected)

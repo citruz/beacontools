@@ -9,7 +9,7 @@ from .utils import bt_addr_to_string
 from .packet_types import EddystoneUIDFrame, EddystoneURLFrame, \
                           EddystoneEncryptedTLMFrame, EddystoneTLMFrame
 from .device_filters import BtAddrFilter, DeviceFilter
-from .utils import is_packet_type, is_one_of
+from .utils import is_packet_type, is_one_of, to_int
 
 LE_META_EVENT = 0x3e
 OGF_LE_CTL = 0x08
@@ -30,17 +30,23 @@ class BeaconScanner(object):
         if device_filter is not None:
             if not isinstance(device_filter, list):
                 device_filter = [device_filter]
-            for filtr in device_filter:
-                if not isinstance(filtr, DeviceFilter):
-                    raise ValueError("Device filters must be instances of DeviceFilter")
+            if len(device_filter) > 0:
+                for filtr in device_filter:
+                    if not isinstance(filtr, DeviceFilter):
+                        raise ValueError("Device filters must be instances of DeviceFilter")
+            else:
+                device_filter = None
 
         # check if packet filters are valid
         if packet_filter is not None:
             if not isinstance(packet_filter, list):
                 packet_filter = [packet_filter]
-            for filtr in packet_filter:
-                if not is_packet_type(filtr):
-                    raise ValueError("Packet filters must be one of the packet types")
+            if len(packet_filter) > 0:
+                for filtr in packet_filter:
+                    if not is_packet_type(filtr):
+                        raise ValueError("Packet filters must be one of the packet types")
+            else:
+                packet_filter = None
 
         self._mon = Monitor(callback, bt_device_id, device_filter, packet_filter)
 
@@ -86,8 +92,8 @@ class Monitor(threading.Thread):
 
         while self.keep_going:
             pkt = self.socket.recv(255)
-            event = pkt[1]
-            subevent = pkt[3]
+            event = to_int(pkt[1])
+            subevent = to_int(pkt[3])
             if event == LE_META_EVENT and subevent == EVT_LE_ADVERTISING_REPORT:
                 # we have an BLE advertisement
                 self.process_packet(pkt)

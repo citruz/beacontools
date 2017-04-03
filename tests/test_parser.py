@@ -34,6 +34,10 @@ class TestParser(unittest.TestCase):
         self.assertEqual(frame.namespace, "12345678901234678901")
         self.assertEqual(frame.instance, "000000000001")
         self.assertEqual(frame.tx_power, -29)
+        self.assertEqual(frame.properties, {
+            "namespace":"12345678901234678901",
+            "instance":"000000000001",
+        })
         self.assertIsNotNone(str(frame))
 
     def test_eddystone_url(self):
