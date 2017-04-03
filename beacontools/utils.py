@@ -5,7 +5,7 @@ import array
 
 def data_to_hexstring(data):
     """Convert an array of binary data to the hex representation as a string."""
-    return hexlify(array.array('B', data).tostring()).decode('ascii')
+    return hexlify(data_to_binstring(data)).decode('ascii')
 
 def data_to_binstring(data):
     """Convert an array of binary data to a binary string."""
