@@ -92,6 +92,8 @@ Scanner
 
 Changelog
 ---------
+* 1.0.1
+    * Implemented a small tweak which reduces the CPU usage.
 * 1.0.0 
     * Implemented iBeacon support
     * Added rssi to callback function.
