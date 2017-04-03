@@ -48,7 +48,7 @@ class TestScanner(unittest.TestCase):
         pkt = b"\x41\x3e\x41\x02\x01\x03\x01\x35\x94\xef\xcd\xd6\x1c\x19\x02\x01\x06\x03\x03\xaa"\
               b"\xfe\x11\x16\xaa\xfe\x20\x00\x0b\x18\x13\x00\x00\x00\x14\x67\x00\x00\x2a\xc4\xe4"
         scanner._mon.process_packet(pkt)
-        callback.assert_called_once()
+        self.assertEqual(callback.call_count, 1)
         args = callback.call_args[0]
         self.assertEqual(args[0], "1c:d6:cd:ef:94:35")
         self.assertIsInstance(args[1], EddystoneTLMFrame)
@@ -62,7 +62,7 @@ class TestScanner(unittest.TestCase):
               b"\xfe\x11\x16\xaa\xfe\x00\xe3\x12\x34\x56\x78\x90\x12\x34\x67\x89\x01\x00\x00\x00"\
               b"\x00\x00\x01\x00\x00\xdd"
         scanner._mon.process_packet(pkt)
-        callback.assert_called_once()
+        self.assertEqual(callback.call_count, 1)
         args = callback.call_args[0]
         self.assertEqual(args[0], "1c:d6:cd:ef:94:35")
         self.assertIsInstance(args[1], EddystoneUIDFrame)
@@ -92,7 +92,7 @@ class TestScanner(unittest.TestCase):
               b"\xfe\x11\x16\xaa\xfe\x00\xe3\x12\x34\x56\x78\x90\x12\x34\x67\x89\x01\x00\x00\x00"\
               b"\x00\x00\x01\x00\x00\xdd"
         scanner._mon.process_packet(pkt)
-        callback.assert_called_once()
+        self.assertEqual(callback.call_count, 1)
         args = callback.call_args[0]
         self.assertEqual(args[0], "1c:d6:cd:ef:94:35")
         self.assertIsInstance(args[1], EddystoneUIDFrame)
@@ -112,7 +112,7 @@ class TestScanner(unittest.TestCase):
               b"\xfe\x11\x16\xaa\xfe\x00\xe3\x12\x34\x56\x78\x90\x12\x34\x67\x89\x01\x00\x00\x00"\
               b"\x00\x00\x01\x00\x00\xdd"
         scanner._mon.process_packet(pkt)
-        callback.assert_called_once()
+        self.assertEqual(callback.call_count, 1)
         args = callback.call_args[0]
         self.assertEqual(args[0], "1c:d6:cd:ef:94:35")
         self.assertIsInstance(args[1], EddystoneUIDFrame)
@@ -145,7 +145,7 @@ class TestScanner(unittest.TestCase):
               b"\xfe\x11\x16\xaa\xfe\x00\xe3\x12\x34\x56\x78\x90\x12\x34\x67\x89\x01\x00\x00\x00"\
               b"\x00\x00\x01\x00\x00\xdd"
         scanner._mon.process_packet(pkt)
-        callback.assert_called_once()
+        self.assertEqual(callback.call_count, 1)
         args = callback.call_args[0]
         self.assertEqual(args[0], "1c:d6:cd:ef:94:35")
         self.assertIsInstance(args[1], EddystoneUIDFrame)
