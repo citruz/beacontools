@@ -1,5 +1,5 @@
 BeaconTools - Universal beacon scanning
-===========
+=======================================
 |Build Status| |Coverage Status|
 
 A Python library for working with various types of Bluetooth LE Beacons.
@@ -53,7 +53,7 @@ Parser
     print("Seconds since boot: %d" % tlm_frame.seconds_since_boot)
 
 Scanner
-~~~~~~
+~~~~~~~
 .. code:: python
 
     from beacontools import BeaconScanner, EddystoneTLMFrame, EddystoneFilter

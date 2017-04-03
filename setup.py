@@ -69,6 +69,8 @@ setup(
             'pytest-cov==2.4.0',
             'check-manifest==0.35',
             'pylint==1.6.5',
+            'readme_renderer',
+            'docutils'
         ],
     },
 )
