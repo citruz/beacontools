@@ -92,6 +92,9 @@ Scanner
 
 Changelog
 ---------
+* 1.1.0
+    * Added support for Eddystone EID frames (thanks to `miek <https://github.com/miek>`__)
+    * Updated dependencies
 * 1.0.1
     * Implemented a small tweak which reduces the CPU usage.
 * 1.0.0 
