@@ -4,8 +4,8 @@ from construct import Struct, Byte, Switch, Const, OneOf, Int8sl, Array, \
 
 from ..const import EDDYSTONE_UUID, EDDYSTONE_URL_SCHEMES, EDDYSTONE_TLM_UNENCRYPTED, \
                     EDDYSTONE_TLM_ENCRYPTED, EDDYSTONE_UID_FRAME, EDDYSTONE_URL_FRAME, \
-                    EDDYSTONE_TLM_FRAME, FLAGS_DATA_TYPE, SERVICE_DATA_TYPE, \
-                    SERVICE_UUIDS_DATA_TYPE
+                    EDDYSTONE_TLM_FRAME, EDDYSTONE_EID_FRAME, FLAGS_DATA_TYPE, \
+                    SERVICE_DATA_TYPE, SERVICE_UUIDS_DATA_TYPE
 
 # pylint: disable=invalid-name
 
@@ -45,6 +45,10 @@ EddystoneTLMFrame = Struct(
                    )
 )
 
+EddystoneEIDFrame = Struct(
+    "tx_power" / Int8sl,
+    "eid" / Array(8, Byte)
+)
 
 ServiceData = Struct(
     "eddystone_identifier" / Const(EDDYSTONE_UUID),
@@ -54,6 +58,7 @@ ServiceData = Struct(
                          EDDYSTONE_UID_FRAME: EddystoneUIDFrame,
                          EDDYSTONE_URL_FRAME: EddystoneURLFrame,
                          EDDYSTONE_TLM_FRAME: EddystoneTLMFrame,
+                         EDDYSTONE_EID_FRAME: EddystoneEIDFrame,
                      }
                     )
 )

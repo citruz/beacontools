@@ -2,6 +2,7 @@
 from .scanner import BeaconScanner
 from .parser import parse_packet
 from .packet_types.eddystone import EddystoneUIDFrame, EddystoneURLFrame, \
-                                    EddystoneEncryptedTLMFrame, EddystoneTLMFrame
+                                    EddystoneEncryptedTLMFrame, EddystoneTLMFrame, \
+                                    EddystoneEIDFrame
 from .packet_types.ibeacon import IBeaconAdvertisement
 from .device_filters import IBeaconFilter, EddystoneFilter, BtAddrFilter

@@ -7,7 +7,8 @@ import bluetooth._bluetooth as bluez
 from .parser import parse_packet
 from .utils import bt_addr_to_string
 from .packet_types import EddystoneUIDFrame, EddystoneURLFrame, \
-                          EddystoneEncryptedTLMFrame, EddystoneTLMFrame
+                          EddystoneEncryptedTLMFrame, EddystoneTLMFrame, \
+                          EddystoneEIDFrame
 from .device_filters import BtAddrFilter, DeviceFilter
 from .utils import is_packet_type, is_one_of, to_int, bin_to_int, get_mode
 from .const import MODE_IBEACON, MODE_EDDYSTONE, LE_META_EVENT, OGF_LE_CTL, \
@@ -167,7 +168,7 @@ class Monitor(threading.Thread):
 
     def get_properties(self, packet, bt_addr):
         """Get properties of beacon depending on type."""
-        if is_one_of(packet, [EddystoneTLMFrame, EddystoneURLFrame, EddystoneEncryptedTLMFrame]):
+        if is_one_of(packet, [EddystoneTLMFrame, EddystoneURLFrame, EddystoneEncryptedTLMFrame, EddystoneEIDFrame]):
             # here we retrieve the namespace and instance which corresponds to the
             # eddystone beacon with this bt address
             return self.properties_from_mapping(bt_addr)
