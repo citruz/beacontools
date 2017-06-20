@@ -1,6 +1,6 @@
 BeaconTools - Universal beacon scanning
 =======================================
-|Build Status| |Coverage Status| |Requirements Status|
+|PyPI Package| |Build Status| |Coverage Status| |Requirements Status|
 
 A Python library for working with various types of Bluetooth LE Beacons.
 
@@ -103,7 +103,8 @@ Changelog
 * 0.1.2 
     * Initial release
 
-
+.. |PyPI Package| image:: https://badge.fury.io/py/beacontools.svg
+  :target: https://pypi.python.org/pypi/beacontools/
 .. |Build Status| image:: https://travis-ci.org/citruz/beacontools.svg?branch=master
     :target: https://travis-ci.org/citruz/beacontools
 .. |Coverage Status| image:: https://coveralls.io/repos/github/citruz/beacontools/badge.svg?branch=master
