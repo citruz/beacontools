@@ -3,9 +3,10 @@ from construct import ConstructError
 
 from .structs import EddystoneFrame, IBeaconAdvertisingPacket
 from .packet_types import EddystoneUIDFrame, EddystoneURLFrame, EddystoneEncryptedTLMFrame, \
-                          EddystoneTLMFrame, IBeaconAdvertisement
+                          EddystoneTLMFrame, EddystoneEIDFrame, IBeaconAdvertisement
 from .const import EDDYSTONE_TLM_UNENCRYPTED, EDDYSTONE_TLM_ENCRYPTED, SERVICE_DATA_TYPE, \
-                   EDDYSTONE_UID_FRAME, EDDYSTONE_TLM_FRAME, EDDYSTONE_URL_FRAME
+                   EDDYSTONE_UID_FRAME, EDDYSTONE_TLM_FRAME, EDDYSTONE_URL_FRAME, \
+                   EDDYSTONE_EID_FRAME
 
 
 def parse_packet(packet):
@@ -15,6 +16,7 @@ def parse_packet(packet):
         frame = parse_ibeacon_packet(packet)
     return frame
 
+# pylint: disable=too-many-return-statements
 def parse_eddystone_packet(packet):
     """Parse an eddystone beacon advertisement packet."""
     try:
@@ -33,6 +35,9 @@ def parse_eddystone_packet(packet):
 
                 elif data['frame_type'] == EDDYSTONE_URL_FRAME:
                     return EddystoneURLFrame(data['frame'])
+
+                elif data['frame_type'] == EDDYSTONE_EID_FRAME:
+                    return EddystoneEIDFrame(data['frame'])
 
     except ConstructError:
         return None

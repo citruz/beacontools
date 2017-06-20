@@ -37,9 +37,10 @@ def is_one_of(obj, types):
 def is_packet_type(cls):
     """Check if class is one the packet types."""
     from .packet_types import EddystoneUIDFrame, EddystoneURLFrame, \
-                              EddystoneEncryptedTLMFrame, EddystoneTLMFrame, IBeaconAdvertisement
+                              EddystoneEncryptedTLMFrame, EddystoneTLMFrame, \
+                              EddystoneEIDFrame, IBeaconAdvertisement
     return (cls in [EddystoneURLFrame, EddystoneUIDFrame, EddystoneEncryptedTLMFrame, \
-                    EddystoneTLMFrame, IBeaconAdvertisement])
+                    EddystoneTLMFrame, EddystoneEIDFrame, IBeaconAdvertisement])
 
 def to_int(string):
     """Convert a one element byte string to int for python 2 support."""

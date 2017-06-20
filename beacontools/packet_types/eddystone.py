@@ -1,4 +1,5 @@
 """Packet classes for Eddystone beacons."""
+from binascii import hexlify
 from ..const import EDDYSTONE_URL_SCHEMES, EDDYSTONE_TLD_ENCODINGS
 from ..utils import data_to_hexstring, data_to_binstring
 
@@ -125,4 +126,24 @@ class EddystoneTLMFrame(object):
         return "EddystoneTLMFrame<voltage: %d mV, temperature: %d Celsius, advertising count: %d,"\
                " seconds since boot: %d>" % (self.voltage, self.temperature, \
                 self.advertising_count, self.seconds_since_boot)
-    
+
+class EddystoneEIDFrame(object):
+    """Eddystone EID frame."""
+
+    def __init__(self, data):
+        self._tx_power = data['tx_power']
+        self._eid = data_to_binstring(data['eid'])
+
+    @property
+    def tx_power(self):
+        """Calibrated Tx power at 0 m."""
+        return self._tx_power
+
+    @property
+    def eid(self):
+        """8-byte Ephemeral Identifier."""
+        return self._eid
+
+    def __str__(self):
+        return "EddystoneEIDFrame<tx_power: %d, eid: %s>" \
+               % (self.tx_power, hexlify(self.eid))
