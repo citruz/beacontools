@@ -16,6 +16,7 @@ def parse_packet(packet):
         frame = parse_ibeacon_packet(packet)
     return frame
 
+# pylint: disable=too-many-return-statements
 def parse_eddystone_packet(packet):
     """Parse an eddystone beacon advertisement packet."""
     try:
