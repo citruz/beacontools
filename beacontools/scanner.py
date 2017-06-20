@@ -168,7 +168,8 @@ class Monitor(threading.Thread):
 
     def get_properties(self, packet, bt_addr):
         """Get properties of beacon depending on type."""
-        if is_one_of(packet, [EddystoneTLMFrame, EddystoneURLFrame, EddystoneEncryptedTLMFrame, EddystoneEIDFrame]):
+        if is_one_of(packet, [EddystoneTLMFrame, EddystoneURLFrame, \
+                              EddystoneEncryptedTLMFrame, EddystoneEIDFrame]):
             # here we retrieve the namespace and instance which corresponds to the
             # eddystone beacon with this bt address
             return self.properties_from_mapping(bt_addr)
