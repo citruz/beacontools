@@ -27,7 +27,7 @@ If you want to perfom beacon **scanning** there are a few more requirement. Firs
 .. code:: bash
 
     # install libbluetooth headers and libpcap2
-    sudo apt-get install libbluetooth-dev libcap2-bin
+    sudo apt-get install python-dev libbluetooth-dev libcap2-bin
     # grant the python executable permission to access raw socket data
     sudo setcap 'cap_net_raw,cap_net_admin+eip' $(readlink -f $(which python))
     # install beacontools with scanning support
