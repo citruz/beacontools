@@ -1,4 +1,4 @@
-"""All low level structures used for parsing eddystone packets."""
+"""All low level structures used for parsing ibeacon packets."""
 from construct import Struct, Byte, Const, Int8sl, Array, Int16ub
 
 from ..const import IBEACON_COMPANY_ID, IBEACON_PROXIMITY_TPYE
