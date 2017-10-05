@@ -90,7 +90,7 @@ class EddystoneEncryptedTLMFrame(object):
 
     def __str__(self):
         return "EddystoneEncryptedTLMFrame<encrypted_data: %s, salt: %d, mic: %d>" \
-               % (self.encrypted_data, self.salt, self.mic)
+               % (hexlify(self.encrypted_data), self.salt, self.mic)
 
 
 class EddystoneTLMFrame(object):
