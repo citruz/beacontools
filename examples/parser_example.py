@@ -48,3 +48,14 @@ print("UUID: %s" % adv.uuid)
 print("Major: %d" % adv.major)
 print("Minor: %d" % adv.minor)
 print("TX Power: %d" % adv.tx_power)
+
+print("-----")
+# Cypress iBeacon Sensor
+cypress_packet = b"\x02\x01\x04\x1a\xff\x4c\x00\x02\x15\x00\x05\x00\x01\x00\x00\x10\x00\x80" \
+                 b"\x00\x00\x80\x5f\x9b\x01\x31\x00\x02\x6c\x66\xc3"
+sensor = parse_packet(cypress_packet)
+print("UUID: %s" % sensor.uuid)
+print("Major: %d" % sensor.major)
+print("Temperature: %d °C" % sensor.cypress_temperature)
+print("Humidity: %d %%" % sensor.cypress_humidity)
+print("TX Power: %d" % sensor.tx_power)

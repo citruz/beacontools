@@ -95,3 +95,16 @@ class TestParser(unittest.TestCase):
         self.assertEqual(frame.minor, 2)
         self.assertEqual(frame.tx_power, -8)
         self.assertIsNotNone(str(frame))
+
+    def test_cypress_beacon(self):
+        """Test Cypress Cyalkit-E02 Sensor Beacon advertisement."""
+        cypress_packet = b"\x02\x01\x04\x1a\xff\x4c\x00\x02\x15\x00\x05\x00\x01\x00\x00\x10\x00"\
+                         b"\x80\x00\x00\x80\x5f\x9b\x01\x31\x00\x02\x6c\x66\xc3"
+        frame = parse_packet(cypress_packet)
+        self.assertIsInstance(frame, IBeaconAdvertisement)
+        self.assertEqual(frame.uuid, "00050001-0000-1000-8000-00805f9b0131")
+        self.assertEqual(frame.major, 2)
+        self.assertEqual(int(frame.cypress_temperature*100), 2316)
+        self.assertEqual(int(frame.cypress_humidity*100), 4673)
+        self.assertEqual(frame.tx_power, -61)
+        self.assertIsNotNone(str(frame))
