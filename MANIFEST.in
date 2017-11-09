@@ -1,5 +1,6 @@
-# Include the license file
+# Include the license file and contributors
 include LICENSE.txt
+include CONTRIBUTORS.md
 
 recursive-include beacontools *.py
 
