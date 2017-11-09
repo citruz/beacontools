@@ -31,6 +31,16 @@ class IBeaconAdvertisement(object):
         return self._minor
 
     @property
+    def cypress_temperature(self):
+        """Cypress iBeacon Sensor temperature in C."""
+        return 175.72*((self.minor & 0xff)*256)/65536 - 46.85
+
+    @property
+    def cypress_humidity(self):
+        """Cypress iBeacon Sensor humidity RH%."""
+        return 125.0*(self._minor & 0xff00)/65536 - 6
+
+    @property
     def properties(self):
         """Get beacon properties."""
         return {'uuid': self.uuid, 'major': self.major, 'minor': self.minor}
