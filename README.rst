@@ -92,6 +92,9 @@ Scanner
 
 Changelog
 ---------
+* 1.2.0
+    * Added support for Cypress iBeacons which transmit temp and humidity embedded in the minor value (thanks to `darkskiez <https://github.com/darkskiez>`__)
+    * Updated dependencies
 * 1.1.0
     * Added support for Eddystone EID frames (thanks to `miek <https://github.com/miek>`__)
     * Updated dependencies
