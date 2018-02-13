@@ -53,7 +53,7 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
-        'construct==2.8.16'
+        'construct==2.9.30'
     ],
 
     # List additional groups of dependencies here (e.g. development
@@ -65,11 +65,11 @@ setup(
         'dev': ['check-manifest'],
         'test': [
             'coveralls==1.2.0',
-            'pytest==3.2.5',
+            'pytest==3.4.0',
             'pytest-cov==2.5.1',
             'mock==2.0.0',
             'check-manifest==0.36',
-            'pylint==1.7.4',
+            'pylint==1.8.2',
             'readme_renderer',
             'docutils'
         ],
