@@ -92,6 +92,8 @@ Scanner
 
 Changelog
 ---------
+Beacontools follows the `semantic versioning <https://semver.org/>`__ scheme.
+
 * 1.2.2
     * Moved import of bluez so that the library can be used in parsing-only mode, without having bluez installed.
 * 1.2.1
