@@ -2,8 +2,6 @@
 import threading
 import logging
 
-import bluetooth._bluetooth as bluez
-
 from .parser import parse_packet
 from .utils import bt_addr_to_string
 from .packet_types import EddystoneUIDFrame, EddystoneURLFrame, \
@@ -24,6 +22,9 @@ class BeaconScanner(object):
     """Scan for Beacon advertisements."""
 
     def __init__(self, callback, bt_device_id=0, device_filter=None, packet_filter=None):
+        # do import here so that the package can be used in parsing-only mode (no bluez required)
+        import bluetooth._bluetooth as bluez
+
         """Initialize scanner."""
         # check if device filters are valid
         if device_filter is not None:
