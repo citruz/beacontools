@@ -92,6 +92,8 @@ Scanner
 
 Changelog
 ---------
+* 1.2.1
+    * Updated depedencies
 * 1.2.0
     * Added support for Cypress iBeacons which transmit temp and humidity embedded in the minor value (thanks to `darkskiez <https://github.com/darkskiez>`__)
     * Updated dependencies
