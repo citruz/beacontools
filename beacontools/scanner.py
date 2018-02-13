@@ -1,6 +1,7 @@
 """Classes responsible for Beacon scanning."""
 import threading
 import logging
+from importlib import import_module
 
 from .parser import parse_packet
 from .utils import bt_addr_to_string
@@ -22,8 +23,6 @@ class BeaconScanner(object):
     """Scan for Beacon advertisements."""
 
     def __init__(self, callback, bt_device_id=0, device_filter=None, packet_filter=None):
-        # do import here so that the package can be used in parsing-only mode (no bluez required)
-        import bluetooth._bluetooth as bluez
 
         """Initialize scanner."""
         # check if device filters are valid
@@ -63,6 +62,9 @@ class Monitor(threading.Thread):
 
     def __init__(self, callback, bt_device_id, device_filter, packet_filter):
         """Construct interface object."""
+        # do import here so that the package can be used in parsing-only mode (no bluez required)
+        self.bluez = import_module('bluetooth._bluetooth')
+
         threading.Thread.__init__(self)
         self.daemon = False
         self.keep_going = True
@@ -82,12 +84,12 @@ class Monitor(threading.Thread):
 
     def run(self):
         """Continously scan for BLE advertisements."""
-        self.socket = bluez.hci_open_dev(self.bt_device_id)
+        self.socket = self.bluez.hci_open_dev(self.bt_device_id)
 
-        filtr = bluez.hci_filter_new()
-        bluez.hci_filter_all_events(filtr)
-        bluez.hci_filter_set_ptype(filtr, bluez.HCI_EVENT_PKT)
-        self.socket.setsockopt(bluez.SOL_HCI, bluez.HCI_FILTER, filtr)
+        filtr = self.bluez.hci_filter_new()
+        self.bluez.hci_filter_all_events(filtr)
+        self.bluez.hci_filter_set_ptype(filtr, self.bluez.HCI_EVENT_PKT)
+        self.socket.setsockopt(self.bluez.SOL_HCI, self.bluez.HCI_FILTER, filtr)
 
         self.toggle_scan(True)
 
@@ -105,7 +107,7 @@ class Monitor(threading.Thread):
             command = "\x01\x00"
         else:
             command = "\x00\x00"
-        bluez.hci_send_cmd(self.socket, OGF_LE_CTL, OCF_LE_SET_SCAN_ENABLE, command)
+        self.bluez.hci_send_cmd(self.socket, OGF_LE_CTL, OCF_LE_SET_SCAN_ENABLE, command)
 
     def process_packet(self, pkt):
         """Parse the packet and call callback if one of the filters matches."""

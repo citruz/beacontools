@@ -7,7 +7,7 @@ A Python library for working with various types of Bluetooth LE Beacons.
 Currently supported types are:
 
 * `Eddystone Beacons <https://github.com/google/eddystone/>`__
-* `Apple iBeacons <https://developer.apple.com/ibeacon/>`__ 
+* `iBeacons <https://developer.apple.com/ibeacon/>`__ (Apple and Cypress CYALKIT-E02)
 
 The BeaconTools library has two main components:
 
@@ -92,6 +92,8 @@ Scanner
 
 Changelog
 ---------
+* 1.2.2
+    * Moved import of bluez so that the library can be used in parsing-only mode, without having bluez installed.
 * 1.2.1
     * Updated depedencies
 * 1.2.0
