@@ -53,7 +53,7 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
-        'construct==2.9.30'
+        'construct>=2.8.16,<2.10'
     ],
 
     # List additional groups of dependencies here (e.g. development
