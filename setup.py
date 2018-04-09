@@ -12,7 +12,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 setup(
     name='beacontools',
 
-    version='1.2.2',
+    version='1.2.3',
 
     description='A Python library for working with various types of Bluetooth LE Beacons.',
     long_description=long_description,
@@ -25,7 +25,7 @@ setup(
     license='MIT',
 
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 5 - Production/Stable',
 
         'Intended Audience :: Developers',
         'Topic :: Software Development :: Libraries',
@@ -64,12 +64,12 @@ setup(
         'scan': ['PyBluez==0.22'],
         'dev': ['check-manifest'],
         'test': [
-            'coveralls==1.2.0',
-            'pytest==3.4.0',
+            'coveralls==1.3.0',
+            'pytest==3.5.0',
             'pytest-cov==2.5.1',
             'mock==2.0.0',
             'check-manifest==0.36',
-            'pylint==1.8.2',
+            'pylint==1.8.4',
             'readme_renderer',
             'docutils'
         ],

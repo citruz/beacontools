@@ -1,6 +1,6 @@
 """All low level structures used for parsing eddystone packets."""
 from construct import Struct, Byte, Switch, Const, OneOf, Int8sl, Array, \
-                      Int16ul, Int16ub, Int32ub, GreedyString
+                      Int16ul, Int16ub, Int32ub, GreedyString, GreedyRange
 
 from ..const import EDDYSTONE_UUID, EDDYSTONE_URL_SCHEMES, EDDYSTONE_TLM_UNENCRYPTED, \
                     EDDYSTONE_TLM_ENCRYPTED, EDDYSTONE_UID_FRAME, EDDYSTONE_URL_FRAME, \
@@ -75,4 +75,4 @@ LTV = Struct(
                     ),
 )
 
-EddystoneFrame = LTV[:]
+EddystoneFrame = GreedyRange(LTV)
