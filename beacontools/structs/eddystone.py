@@ -68,7 +68,7 @@ LTV = Struct(
     "type" / Byte,
     "value" / Switch(lambda ctx: ctx.type,
                      {
-                         FLAGS_DATA_TYPE: Const(b"\x06"),
+                         FLAGS_DATA_TYPE: Const(b"\x06") or Const(b"\x1a"),
                          SERVICE_UUIDS_DATA_TYPE: Const(EDDYSTONE_UUID),
                          SERVICE_DATA_TYPE: ServiceData
                      }
