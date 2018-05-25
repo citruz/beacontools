@@ -94,6 +94,9 @@ Changelog
 ---------
 Beacontools follows the `semantic versioning <https://semver.org/>`__ scheme.
 
+* 1.2.4
+    * Added support for Eddystone packets with Flags Data set to 0x1a (thanks to `AndreasTornes <https://github.com/AndreasTornes>`__)
+    * Updated depedencies
 * 1.2.3
     * Fixed compatibility with construct >=2.9.41
 * 1.2.2
