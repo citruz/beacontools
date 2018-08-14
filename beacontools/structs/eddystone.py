@@ -58,14 +58,14 @@ ServiceData = Struct(
     "frame" / Switch(lambda ctx: ctx.service_identifier, {
         # eddystone frames
         EDDYSTONE_UUID: Switch(lambda ctx: ctx.frame_type, {
-                EDDYSTONE_UID_FRAME: EddystoneUIDFrame,
-                EDDYSTONE_URL_FRAME: EddystoneURLFrame,
-                EDDYSTONE_TLM_FRAME: EddystoneTLMFrame,
-                EDDYSTONE_EID_FRAME: EddystoneEIDFrame,
+            EDDYSTONE_UID_FRAME: EddystoneUIDFrame,
+            EDDYSTONE_URL_FRAME: EddystoneURLFrame,
+            EDDYSTONE_TLM_FRAME: EddystoneTLMFrame,
+            EDDYSTONE_EID_FRAME: EddystoneEIDFrame,
         }),
         # estimote frames
         ESTIMOTE_UUID: Switch(lambda ctx: ctx.frame_type & 0xF, {
-                ESTIMOTE_TELEMETRY_FRAME: EstimoteTelemetryFrame,
+            ESTIMOTE_TELEMETRY_FRAME: EstimoteTelemetryFrame,
         }),
     }),
 )
@@ -75,9 +75,9 @@ LTV = Struct(
     "length" / Byte,
     "type" / Byte,
     "value" / Switch(lambda ctx: ctx.type, {
-         FLAGS_DATA_TYPE: Array(lambda ctx: ctx.length -1, Byte),
-         SERVICE_UUIDS_DATA_TYPE: OneOf(Bytes(2), [EDDYSTONE_UUID, ESTIMOTE_UUID]),
-         SERVICE_DATA_TYPE: ServiceData
+        FLAGS_DATA_TYPE: Array(lambda ctx: ctx.length -1, Byte),
+        SERVICE_UUIDS_DATA_TYPE: OneOf(Bytes(2), [EDDYSTONE_UUID, ESTIMOTE_UUID]),
+        SERVICE_DATA_TYPE: ServiceData
     }, default=Array(lambda ctx: ctx.length -1, Byte)),
 )
 
