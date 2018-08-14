@@ -1,6 +1,5 @@
-from construct import Struct, Byte, Switch, Const, OneOf, Int8sl, Array, Int8ul, \
-                      Int16ul, Int16ub, Int32ub, GreedyString, GreedyRange, Probe, \
-                      IfThenElse
+"""All low level structures used for parsing Estimote packets."""
+from construct import Struct, Byte, Switch, Int8sl, Array, Int8ul
 
 from ..const import ESTIMOTE_TELEMETRY_SUBFRAME_A, ESTIMOTE_TELEMETRY_SUBFRAME_B
 

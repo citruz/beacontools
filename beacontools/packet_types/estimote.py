@@ -1,3 +1,4 @@
+"""Packet classes for Estimote beacons."""
 from ..utils import data_to_hexstring
 
 class EstimoteTelemetryFrameA(object):
@@ -41,7 +42,9 @@ class EstimoteTelemetryFrameA(object):
         else:
             self._pressure = None
 
-    def parse_motion_state(self, val):
+    @staticmethod
+    def parse_motion_state(val):
+        """Convert motion state byte to seconds."""
         number = val & 0b00111111
         unit = (val & 0b11000000) >> 6
         if unit == 1:
@@ -78,7 +81,7 @@ class EstimoteTelemetryFrameA(object):
     @property
     def current_motion_state(self):
         """Duration of current motion state in seconds.
-        E.g., if is_moving is True, this states how long the beacon is beeing moved already and 
+        E.g., if is_moving is True, this states how long the beacon is beeing moved already and
         previous_motion_state will tell how long it has been still before."""
         return self._current_motion_state
 
@@ -95,7 +98,8 @@ class EstimoteTelemetryFrameA(object):
 
     @property
     def has_firmware_error(self):
-        """If beacon has a firmware problem. Only available if protocol version > 0, None otherwise."""
+        """If beacon has a firmware problem.
+        Only available if protocol version > 0, None otherwise."""
         return self._has_firmware_error
 
     @property
@@ -111,7 +115,8 @@ class EstimoteTelemetryFrameA(object):
 
 
     def __str__(self):
-        return "EstimoteTelemetryFrameA<identifier: %s, protocol_version: %u>" % (self.identifier, self.protocol_version)
+        return "EstimoteTelemetryFrameA<identifier: %s, protocol_version: %u>" \
+            % (self.identifier, self.protocol_version)
 
 
 
@@ -133,11 +138,12 @@ class EstimoteTelemetryFrameB(object):
         if ambient_upper == 0xf and ambient_lower == 0xf:
             self._ambient_light = None
         else:
-            self._ambient_light = pow(2, ambient_upper) * ambient_lower * 0.72;
+            self._ambient_light = pow(2, ambient_upper) * ambient_lower * 0.72
         # uptime
         uptime_unit_code = (sub['combined_fields'][1] & 0b00110000) >> 4
-        uptime_number = ((sub['combined_fields'][1] & 0b00001111) << 8) | sub['combined_fields'][0]
-        if uptime_unit_code ==  1:
+        uptime_number = ((sub['combined_fields'][1] & 0b00001111) << 8) | \
+                            sub['combined_fields'][0]
+        if uptime_unit_code == 1:
             uptime_number *= 60 # minutes
         elif uptime_unit_code == 2:
             uptime_number *= 60 * 60 # hours
@@ -151,7 +157,7 @@ class EstimoteTelemetryFrameB(object):
                         (sub['combined_fields'][2]               <<  2) |  \
                         ((sub['combined_fields'][1] & 0b11000000) >>  6)
         temperature = temperature - 4096 if temperature > 2047 else temperature
-        self._temperature = temperature / 16.0;
+        self._temperature = temperature / 16.0
         # battery voltage
         voltage = (sub['combined_fields'][4] << 6) |  \
                     ((sub['combined_fields'][3] & 0b11111100) >> 2)
@@ -179,7 +185,8 @@ class EstimoteTelemetryFrameB(object):
 
     @property
     def magnetic_field(self):
-        """Tuple of magnetic field values for (X, Y, Z) axis. Between -1 and 1 or None if all bits are set."""
+        """Tuple of magnetic field values for (X, Y, Z) axis.
+        Between -1 and 1 or None if all bits are set."""
         return self._magnetic_field
 
     @property
@@ -199,19 +206,23 @@ class EstimoteTelemetryFrameB(object):
 
     @property
     def has_firmware_error(self):
-        """If beacon has a firmware problem. Only available if protocol version is 0, None otherwise."""
+        """Whether beacon has a firmware problem.
+        Only available if protocol version is 0, None otherwise."""
         return self._has_firmware_error
 
     @property
     def has_clock_error(self):
-        """If beacon has a clock problem. Only available if protocol version is 0, None otherwise."""
+        """Whether beacon has a clock problem.
+        Only available if protocol version is 0, None otherwise."""
         return self._has_clock_error
 
     @property
     def battery_level(self):
-        """Beacon battery level between 0 and 100. None if protocol version is 0 or not measured yet."""
+        """Beacon battery level between 0 and 100.
+        None if protocol version is 0 or not measured yet."""
         return self._battery_level
 
 
     def __str__(self):
-        return "EstimoteTelemetryFrameB<identifier: %s, protocol_version: %u>" % (self.identifier, self.protocol_version)
+        return "EstimoteTelemetryFrameB<identifier: %s, protocol_version: %u>" \
+            % (self.identifier, self.protocol_version)

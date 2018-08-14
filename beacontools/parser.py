@@ -1,6 +1,5 @@
 """Beacon advertisement parser."""
 from construct import ConstructError
-from pprint import pprint
 
 from .structs import EddystoneFrame, IBeaconAdvertisingPacket
 from .packet_types import EddystoneUIDFrame, EddystoneURLFrame, EddystoneEncryptedTLMFrame, \
