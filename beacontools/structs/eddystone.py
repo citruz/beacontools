@@ -57,7 +57,6 @@ EddystoneEIDFrame = Struct(
 ServiceData = Struct(
     "service_identifier" / OneOf(Bytes(2), [EDDYSTONE_UUID, ESTIMOTE_UUID]),
     "frame_type" / Byte,
-    #Probe(),
     "frame" / Switch(lambda ctx: ctx.service_identifier, {
                 # eddystone frames
                 EDDYSTONE_UUID: Switch(lambda ctx: ctx.frame_type, {
@@ -76,10 +75,8 @@ ServiceData = Struct(
 
 
 LTV = Struct(
-    #Probe(),
     "length" / Byte,
     "type" / Byte,
-    #Probe(),
     "value" / Switch(lambda ctx: ctx.type,
                      {
                          FLAGS_DATA_TYPE: Array(lambda ctx: ctx.length -1, Byte),

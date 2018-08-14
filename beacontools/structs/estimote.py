@@ -16,7 +16,6 @@ EstimoteTelemetrySubFrameB = Struct(
     "ambient_light" / Int8ul,
     "combined_fields" / Array(5, Byte),
     "battery_level" / Int8ul,
-    #Probe(),
 )
 
 EstimoteTelemetryFrame = Struct(

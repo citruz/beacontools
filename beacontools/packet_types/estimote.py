@@ -93,4 +93,4 @@ class EstimoteTelemetryFrameB(object):
 
 
     def __str__(self):
-        return "EstimoteTelemetryFrameB<identifier: %s>" % (self.identifier)
+        return "EstimoteTelemetryFrameB<identifier: %s, protocol_version: %u>" % (self.identifier, self.protocol_version)
