@@ -7,8 +7,10 @@ from ..const import ESTIMOTE_TELEMETRY_SUBFRAME_A, ESTIMOTE_TELEMETRY_SUBFRAME_B
 # pylint: disable=invalid-name
 
 EstimoteTelemetrySubFrameA = Struct(
-    Probe(),
-
+    "acceleration" / Array(3, Int8sl),
+    "previous_motion" / Byte,
+    "current_motion" / Byte,
+    "combined_fields" / Array(5, Byte),
 )
 
 EstimoteTelemetrySubFrameB = Struct(

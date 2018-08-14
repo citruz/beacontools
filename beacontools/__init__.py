@@ -6,5 +6,5 @@ from .packet_types.eddystone import EddystoneUIDFrame, EddystoneURLFrame, \
                                     EddystoneEncryptedTLMFrame, EddystoneTLMFrame, \
                                     EddystoneEIDFrame
 from .packet_types.ibeacon import IBeaconAdvertisement
-from .packet_types.estimote import EstimoteTelemetryFrameB
+from .packet_types.estimote import EstimoteTelemetryFrameA, EstimoteTelemetryFrameB
 from .device_filters import IBeaconFilter, EddystoneFilter, BtAddrFilter

@@ -5,7 +5,7 @@ from pprint import pprint
 from .structs import EddystoneFrame, IBeaconAdvertisingPacket
 from .packet_types import EddystoneUIDFrame, EddystoneURLFrame, EddystoneEncryptedTLMFrame, \
                           EddystoneTLMFrame, EddystoneEIDFrame, IBeaconAdvertisement, \
-                          EstimoteTelemetryFrameB
+                          EstimoteTelemetryFrameA, EstimoteTelemetryFrameB
 from .const import EDDYSTONE_TLM_UNENCRYPTED, EDDYSTONE_TLM_ENCRYPTED, SERVICE_DATA_TYPE, \
                    EDDYSTONE_UID_FRAME, EDDYSTONE_TLM_FRAME, EDDYSTONE_URL_FRAME, \
                    EDDYSTONE_EID_FRAME, EDDYSTONE_UUID, ESTIMOTE_UUID, ESTIMOTE_TELEMETRY_FRAME, \
@@ -62,8 +62,7 @@ def parse_estimote_service_data(data):
     if data['frame_type'] & 0xF == ESTIMOTE_TELEMETRY_FRAME:
         protocol_version = (data['frame_type'] & 0xF0) >> 4
         if data['frame']['subframe_type'] == ESTIMOTE_TELEMETRY_SUBFRAME_A:
-            #return EstimoteTelemetryFrameA(data['frame'])
-            return None
+            return EstimoteTelemetryFrameA(data['frame'], protocol_version)
         elif data['frame']['subframe_type'] == ESTIMOTE_TELEMETRY_SUBFRAME_B:
             return EstimoteTelemetryFrameB(data['frame'], protocol_version)
     return None
