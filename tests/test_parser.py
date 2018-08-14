@@ -3,7 +3,7 @@ import unittest
 
 from beacontools import parse_packet, EddystoneUIDFrame, EddystoneURLFrame, \
                         EddystoneEncryptedTLMFrame, EddystoneTLMFrame, EddystoneEIDFrame, \
-                        IBeaconAdvertisement
+                        IBeaconAdvertisement, EstimoteTelemetryFrameB
 
 class TestParser(unittest.TestCase):
     """Test the parser."""
@@ -108,3 +108,18 @@ class TestParser(unittest.TestCase):
         self.assertEqual(int(frame.cypress_humidity*100), 4673)
         self.assertEqual(frame.tx_power, -61)
         self.assertIsNotNone(str(frame))
+
+    def test_estimote_telemetry_b(self):
+        telemetry_b_packet = b"\x02\x01\x04\x03\x03\x9a\xfe\x17\x16\x9a\xfe\x22\x47\xa0\x38\xd5"\
+                             b"\xeb\x03\x26\x40\x01\xff\xff\xff\xff\x49\x25\x66\xbc\x2e\x50"
+        frame = parse_packet(telemetry_b_packet)
+        self.assertIsInstance(frame, EstimoteTelemetryFrameB)
+        self.assertEqual(frame.identifier, "47a038d5eb032640")
+        self.assertEqual(frame.protocol_version, 2)
+        self.assertEqual(frame.magnetic_field, (-0.0078125, -0.0078125, -0.0078125))
+        self.assertTrue(abs(frame.ambient_light - 353894.4) < 0.001)
+        self.assertEqual(frame.uptime, 4870800)
+        self.assertEqual(frame.temperature, 25.5)
+        self.assertEqual(frame.has_firmware_error, None)
+        self.assertEqual(frame.has_clock_error, None)
+        self.assertEqual(frame.battery_level, 80)
