@@ -113,11 +113,14 @@ class EstimoteTelemetryFrameA(object):
         Only available if protocol version is 2, None otherwise ."""
         return self._pressure
 
+    @property
+    def properties(self):
+        """Get beacon properties."""
+        return {'identifier': self.identifier, 'protocol_version': self.protocol_version}
 
     def __str__(self):
         return "EstimoteTelemetryFrameA<identifier: %s, protocol_version: %u>" \
             % (self.identifier, self.protocol_version)
-
 
 
 class EstimoteTelemetryFrameB(object):
@@ -222,6 +225,10 @@ class EstimoteTelemetryFrameB(object):
         None if protocol version is 0 or not measured yet."""
         return self._battery_level
 
+    @property
+    def properties(self):
+        """Get beacon properties."""
+        return {'identifier': self.identifier, 'protocol_version': self.protocol_version}
 
     def __str__(self):
         return "EstimoteTelemetryFrameB<identifier: %s, protocol_version: %u>" \

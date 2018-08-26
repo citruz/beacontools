@@ -1,9 +1,13 @@
 """Constants."""
+from enum import IntEnum
 
 # for scanner
-MODE_IBEACON = 1
-MODE_EDDYSTONE = 2
-MODE_BOTH = 3
+class ScannerMode(IntEnum):
+    MODE_NONE = 0
+    MODE_IBEACON = 1
+    MODE_EDDYSTONE = 2
+    MODE_ESTIMOTE = 4
+    MODE_ALL = MODE_IBEACON | MODE_EDDYSTONE | MODE_ESTIMOTE
 
 LE_META_EVENT = 0x3e
 OGF_LE_CTL = 0x08

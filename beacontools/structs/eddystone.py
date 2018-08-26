@@ -81,4 +81,4 @@ LTV = Struct(
     }, default=Array(lambda ctx: ctx.length -1, Byte)),
 )
 
-EddystoneFrame = GreedyRange(LTV)
+LTVFrame = GreedyRange(LTV)
