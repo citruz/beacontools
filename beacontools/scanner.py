@@ -10,8 +10,8 @@ from .packet_types import EddystoneUIDFrame, EddystoneURLFrame, \
                           EddystoneEIDFrame
 from .device_filters import BtAddrFilter, DeviceFilter
 from .utils import is_packet_type, is_one_of, to_int, bin_to_int, get_mode
-from .const import MODE_IBEACON, MODE_EDDYSTONE, LE_META_EVENT, OGF_LE_CTL, \
-                   OCF_LE_SET_SCAN_ENABLE, EVT_LE_ADVERTISING_REPORT, MODE_BOTH
+from .const import ScannerMode, LE_META_EVENT, OGF_LE_CTL, \
+                   OCF_LE_SET_SCAN_ENABLE, EVT_LE_ADVERTISING_REPORT
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -111,12 +111,13 @@ class Monitor(threading.Thread):
 
     def process_packet(self, pkt):
         """Parse the packet and call callback if one of the filters matches."""
+
         # check if this could be a valid packet before parsing
         # this reduces the CPU load significantly
-        if (self.mode == MODE_BOTH and \
-                (pkt[19:21] != b"\xaa\xfe") and (pkt[19:23] != b"\x4c\x00\x02\x15")) \
-                or (self.mode == MODE_EDDYSTONE and (pkt[19:21] != b"\xaa\xfe")) \
-                or (self.mode == MODE_IBEACON and (pkt[19:23] != b"\x4c\x00\x02\x15")):
+        if not ( \
+            ((self.mode & ScannerMode.MODE_IBEACON) and (pkt[19:23] == b"\x4c\x00\x02\x15")) or \
+            ((self.mode & ScannerMode.MODE_EDDYSTONE) and (pkt[19:21] == b"\xaa\xfe")) or \
+            ((self.mode & ScannerMode.MODE_ESTIMOTE) and (pkt[19:21] == b"\x9a\xfe"))):
             return
 
         bt_addr = bt_addr_to_string(pkt[7:13])
@@ -127,7 +128,6 @@ class Monitor(threading.Thread):
         # return if packet was not an beacon advertisement
         if not packet:
             return
-
 
         # we need to remeber which eddystone beacon has which bt address
         # because the TLM and URL frames do not contain the namespace and instance

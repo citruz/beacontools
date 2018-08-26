@@ -3,8 +3,8 @@ from binascii import hexlify
 import array
 import struct
 
-from .const import MODE_IBEACON, MODE_EDDYSTONE, MODE_BOTH
-from .device_filters import IBeaconFilter, EddystoneFilter, BtAddrFilter
+from .const import ScannerMode
+from .device_filters import IBeaconFilter, EddystoneFilter, BtAddrFilter, EstimoteFilter
 
 def data_to_hexstring(data):
     """Convert an array of binary data to the hex representation as a string."""
@@ -38,9 +38,11 @@ def is_packet_type(cls):
     """Check if class is one the packet types."""
     from .packet_types import EddystoneUIDFrame, EddystoneURLFrame, \
                               EddystoneEncryptedTLMFrame, EddystoneTLMFrame, \
-                              EddystoneEIDFrame, IBeaconAdvertisement
+                              EddystoneEIDFrame, IBeaconAdvertisement, \
+                              EstimoteTelemetryFrameA, EstimoteTelemetryFrameB
     return (cls in [EddystoneURLFrame, EddystoneUIDFrame, EddystoneEncryptedTLMFrame, \
-                    EddystoneTLMFrame, EddystoneEIDFrame, IBeaconAdvertisement])
+                    EddystoneTLMFrame, EddystoneEIDFrame, IBeaconAdvertisement, \
+                    EstimoteTelemetryFrameA, EstimoteTelemetryFrameB])
 
 def to_int(string):
     """Convert a one element byte string to int for python 2 support."""
@@ -59,22 +61,18 @@ def bin_to_int(string):
 def get_mode(device_filter):
     """Determine which beacons the scanner should look for."""
     if device_filter is None or len(device_filter) == 0:
-        return MODE_BOTH
+        return ScannerMode.MODE_ALL
 
-    found_eddy = False
-    found_ibeacon = False
+    mode = ScannerMode.MODE_NONE
     for filtr in device_filter:
         if isinstance(filtr, IBeaconFilter):
-            found_ibeacon = True
+            mode |= ScannerMode.MODE_IBEACON
         elif isinstance(filtr, EddystoneFilter):
-            found_eddy = True
+            mode |= ScannerMode.MODE_EDDYSTONE
+        elif isinstance(filtr, EstimoteFilter):
+            mode |= ScannerMode.MODE_ESTIMOTE
         elif isinstance(filtr, BtAddrFilter):
-            found_eddy = True
-            found_ibeacon = True
+            mode |= ScannerMode.MODE_ALL
+            break
 
-    if found_ibeacon and found_eddy:
-        return MODE_BOTH
-    elif found_eddy:
-        return MODE_EDDYSTONE
-    else:
-        return MODE_IBEACON
+    return mode

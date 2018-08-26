@@ -3,7 +3,7 @@ import unittest
 
 from beacontools import parse_packet, EddystoneUIDFrame, EddystoneURLFrame, \
                         EddystoneEncryptedTLMFrame, EddystoneTLMFrame, EddystoneEIDFrame, \
-                        IBeaconAdvertisement
+                        IBeaconAdvertisement, EstimoteTelemetryFrameA, EstimoteTelemetryFrameB
 
 class TestParser(unittest.TestCase):
     """Test the parser."""
@@ -63,6 +63,18 @@ class TestParser(unittest.TestCase):
         self.assertEqual(frame.seconds_since_boot, 10948)
         self.assertIsNotNone(str(frame))
 
+    def test_eddystone_tlm2(self):
+        """Test TLM frame."""
+        tlm_packet = b"\x02\x01\x06\x03\x03\xaa\xfe\x11\x16\xaa\xfe\x20\x00\x0b\x18\x47\x11\x00" \
+                     b"\x00\x14\x67\x00\x00\x2a\xc4\xe4"
+        frame = parse_packet(tlm_packet)
+        self.assertIsInstance(frame, EddystoneTLMFrame)
+        self.assertEqual(frame.voltage, 2840)
+        self.assertTrue(abs(frame.temperature_fixed_point - 17.27) < 0.1)
+        self.assertEqual(frame.advertising_count, 5223)
+        self.assertEqual(frame.seconds_since_boot, 10948)
+        self.assertIsNotNone(str(frame))
+
     def test_eddystone_tlm_enc(self):
         """Test encrypted TLM frame."""
         enc_tlm_packet = b"\x02\x01\x06\x03\x03\xaa\xfe\x11\x16\xaa\xfe\x20\x01\x41\x41\x41" \
@@ -107,4 +119,104 @@ class TestParser(unittest.TestCase):
         self.assertEqual(int(frame.cypress_temperature*100), 2316)
         self.assertEqual(int(frame.cypress_humidity*100), 4673)
         self.assertEqual(frame.tx_power, -61)
+        self.assertIsNotNone(str(frame))
+
+
+    def test_estimote_telemetry_a(self):
+        telemetry_a_packet = b"\x02\x01\x04\x03\x03\x9a\xfe\x17\x16\x9a\xfe\x22\x47\xa0\x38\xd5"\
+                             b"\xeb\x03\x26\x40\x00\x00\x01\x41\x44\x47\xfa\xff\xff\xff\xff"
+        frame = parse_packet(telemetry_a_packet)
+        self.assertIsInstance(frame, EstimoteTelemetryFrameA)
+        self.assertEqual(frame.identifier, "47a038d5eb032640")
+        self.assertEqual(frame.protocol_version, 2)
+        self.assertEqual(frame.acceleration, (0, 2/127.0, 130/127.0))
+        self.assertEqual(frame.is_moving, False)
+        self.assertEqual(frame.current_motion_state, 420)
+        self.assertEqual(frame.previous_motion_state, 240)
+        self.assertEqual(frame.gpio_states, (1, 1, 1, 1))
+        self.assertEqual(frame.has_firmware_error, False)
+        self.assertEqual(frame.has_clock_error, True)
+        self.assertEqual(frame.pressure, None)
+        self.assertIsNotNone(str(frame))
+
+    def test_estimote_telemetry_a2(self):
+        telemetry_a_packet = b"\x02\x01\x04\x03\x03\x9a\xfe\x17\x16\x9a\xfe\x12\x47\xa0\x38\xd5"\
+                             b"\xeb\x03\x26\x40\x00\x00\x01\x41\x44\x47\xf0\x01\x00\x00\x00"
+        frame = parse_packet(telemetry_a_packet)
+        self.assertIsInstance(frame, EstimoteTelemetryFrameA)
+        self.assertEqual(frame.identifier, "47a038d5eb032640")
+        self.assertEqual(frame.protocol_version, 1)
+        self.assertEqual(frame.acceleration, (0, 2/127.0, 130/127.0))
+        self.assertEqual(frame.is_moving, False)
+        self.assertEqual(frame.current_motion_state, 420)
+        self.assertEqual(frame.previous_motion_state, 240)
+        self.assertEqual(frame.gpio_states, (1, 1, 1, 1))
+        self.assertEqual(frame.has_firmware_error, True)
+        self.assertEqual(frame.has_clock_error, False)
+        self.assertEqual(frame.pressure, None)
+        self.assertIsNotNone(str(frame))
+
+    def test_estimote_telemetry_a3(self):
+        telemetry_a_packet = b"\x02\x01\x04\x03\x03\x9a\xfe\x17\x16\x9a\xfe\x02\x47\xa0\x38\xd5"\
+                             b"\xeb\x03\x26\x40\x00\x00\x01\x41\x44\x47\xf0\x01\x00\x00\x00"
+        frame = parse_packet(telemetry_a_packet)
+        self.assertIsInstance(frame, EstimoteTelemetryFrameA)
+        self.assertEqual(frame.identifier, "47a038d5eb032640")
+        self.assertEqual(frame.protocol_version, 0)
+        self.assertEqual(frame.acceleration, (0, 2/127.0, 130/127.0))
+        self.assertEqual(frame.is_moving, False)
+        self.assertEqual(frame.current_motion_state, 420)
+        self.assertEqual(frame.previous_motion_state, 240)
+        self.assertEqual(frame.gpio_states, (1, 1, 1, 1))
+        self.assertEqual(frame.has_firmware_error, None)
+        self.assertEqual(frame.has_clock_error, None)
+        self.assertEqual(frame.pressure, None)
+        self.assertIsNotNone(str(frame))
+
+    def test_estimote_telemetry_b(self):
+        telemetry_b_packet = b"\x02\x01\x04\x03\x03\x9a\xfe\x17\x16\x9a\xfe\x22\x47\xa0\x38\xd5"\
+                             b"\xeb\x03\x26\x40\x01\xff\xff\xff\xff\x49\x25\x66\xbc\x2e\x50"
+        frame = parse_packet(telemetry_b_packet)
+        self.assertIsInstance(frame, EstimoteTelemetryFrameB)
+        self.assertEqual(frame.identifier, "47a038d5eb032640")
+        self.assertEqual(frame.protocol_version, 2)
+        self.assertEqual(frame.magnetic_field, None)
+        self.assertEqual(frame.ambient_light, None)
+        self.assertEqual(frame.uptime, 4870800)
+        self.assertEqual(frame.temperature, 25.5)
+        self.assertEqual(frame.has_firmware_error, None)
+        self.assertEqual(frame.has_clock_error, None)
+        self.assertEqual(frame.battery_level, 80)
+        self.assertIsNotNone(str(frame))
+
+    def test_estimote_telemetry_b2(self):
+        telemetry_b_packet = b"\x02\x01\x04\x03\x03\x9a\xfe\x17\x16\x9a\xfe\x22\x47\xa0\x38\xd5"\
+                             b"\xeb\x03\x26\x40\x01\xd8\x42\xed\x73\x49\x25\x66\xbc\x2e\x50"
+        frame = parse_packet(telemetry_b_packet)
+        self.assertIsInstance(frame, EstimoteTelemetryFrameB)
+        self.assertEqual(frame.identifier, "47a038d5eb032640")
+        self.assertEqual(frame.protocol_version, 2)
+        self.assertEqual(frame.magnetic_field, (-0.3125, 0.515625, -0.1484375))
+        self.assertEqual(frame.ambient_light, 276.48)
+        self.assertEqual(frame.uptime, 4870800)
+        self.assertEqual(frame.temperature, 25.5)
+        self.assertEqual(frame.has_firmware_error, None)
+        self.assertEqual(frame.has_clock_error, None)
+        self.assertEqual(frame.battery_level, 80)
+        self.assertIsNotNone(str(frame))
+
+    def test_estimote_telemetry_b3(self):
+        telemetry_b_packet = b"\x02\x01\x04\x03\x03\x9a\xfe\x17\x16\x9a\xfe\x02\x47\xa0\x38\xd5"\
+                             b"\xeb\x03\x26\x40\x01\xd8\x42\xed\x73\x49\x25\x66\xbc\x2e\x53"
+        frame = parse_packet(telemetry_b_packet)
+        self.assertIsInstance(frame, EstimoteTelemetryFrameB)
+        self.assertEqual(frame.identifier, "47a038d5eb032640")
+        self.assertEqual(frame.protocol_version, 0)
+        self.assertEqual(frame.magnetic_field, (-0.3125, 0.515625, -0.1484375))
+        self.assertEqual(frame.ambient_light, 276.48)
+        self.assertEqual(frame.uptime, 4870800)
+        self.assertEqual(frame.temperature, 25.5)
+        self.assertEqual(frame.has_firmware_error, True)
+        self.assertEqual(frame.has_clock_error, True)
+        self.assertEqual(frame.battery_level, None)
         self.assertIsNotNone(str(frame))

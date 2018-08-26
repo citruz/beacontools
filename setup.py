@@ -12,7 +12,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 setup(
     name='beacontools',
 
-    version='1.2.4',
+    version='1.3.0',
 
     description='A Python library for working with various types of Bluetooth LE Beacons.',
     long_description=long_description,
@@ -35,9 +35,9 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
     ],
 
     keywords='beacons ibeacon eddystone bluetooth low energy ble',
@@ -53,6 +53,7 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
+        'enum34;python_version<"3.4"',
         'construct>=2.8.16,<2.10'
     ],
 
@@ -64,12 +65,12 @@ setup(
         'scan': ['PyBluez==0.22'],
         'dev': ['check-manifest'],
         'test': [
-            'coveralls==1.3.0',
-            'pytest==3.6.0',
+            'coveralls==1.4.0',
+            'pytest==3.7.2',
             'pytest-cov==2.5.1',
             'mock==2.0.0',
             'check-manifest==0.37',
-            'pylint==1.9.1',
+            'pylint',
             'readme_renderer',
             'docutils'
         ],

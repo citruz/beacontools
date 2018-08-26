@@ -8,6 +8,7 @@ Currently supported types are:
 
 * `Eddystone Beacons <https://github.com/google/eddystone/>`__
 * `iBeacons <https://developer.apple.com/ibeacon/>`__ (Apple and Cypress CYALKIT-E02)
+* `Estimote Beacons (Telemetry only) <https://github.com/estimote/estimote-specs>`__
 
 The BeaconTools library has two main components:
 
@@ -94,6 +95,10 @@ Changelog
 ---------
 Beacontools follows the `semantic versioning <https://semver.org/>`__ scheme.
 
+* 1.3.0
+    * Added support for Estimote Telemetry packets (see examples/parser_example.py)
+    * Relaxed parsing constraints for RFU and flags field
+    * Added temperature output in 8.8 fixed point decimal format for Eddystone TLM
 * 1.2.4
     * Added support for Eddystone packets with Flags Data set to 0x1a (thanks to `AndreasTornes <https://github.com/AndreasTornes>`__)
     * Updated depedencies

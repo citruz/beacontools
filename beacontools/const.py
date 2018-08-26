@@ -1,9 +1,14 @@
 """Constants."""
+from enum import IntEnum
 
 # for scanner
-MODE_IBEACON = 1
-MODE_EDDYSTONE = 2
-MODE_BOTH = 3
+class ScannerMode(IntEnum):
+    """Used to determine which packets should be parsed by the scanner."""
+    MODE_NONE = 0
+    MODE_IBEACON = 1
+    MODE_EDDYSTONE = 2
+    MODE_ESTIMOTE = 4
+    MODE_ALL = MODE_IBEACON | MODE_EDDYSTONE | MODE_ESTIMOTE
 
 LE_META_EVENT = 0x3e
 OGF_LE_CTL = 0x08
@@ -53,3 +58,10 @@ EDDYSTONE_TLD_ENCODINGS = {
 IBEACON_COMPANY_ID = b"\x4c\x00"
 IBEACON_PROXIMITY_TYPE = b"\x02\x15"
 CYPRESS_BEACON_DEFAULT_UUID = "00050001-0000-1000-8000-00805f9b0131"
+
+# for Estimote
+ESTIMOTE_UUID = b"\x9a\xfe"
+
+ESTIMOTE_TELEMETRY_FRAME = 0x2
+ESTIMOTE_TELEMETRY_SUBFRAME_A = 0
+ESTIMOTE_TELEMETRY_SUBFRAME_B = 1
