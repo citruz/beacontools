@@ -63,6 +63,18 @@ class TestParser(unittest.TestCase):
         self.assertEqual(frame.seconds_since_boot, 10948)
         self.assertIsNotNone(str(frame))
 
+    def test_eddystone_tlm2(self):
+        """Test TLM frame."""
+        tlm_packet = b"\x02\x01\x06\x03\x03\xaa\xfe\x11\x16\xaa\xfe\x20\x00\x0b\x18\x47\x11\x00" \
+                     b"\x00\x14\x67\x00\x00\x2a\xc4\xe4"
+        frame = parse_packet(tlm_packet)
+        self.assertIsInstance(frame, EddystoneTLMFrame)
+        self.assertEqual(frame.voltage, 2840)
+        self.assertTrue(abs(frame.temperature_fixed_point - 17.27) < 0.1)
+        self.assertEqual(frame.advertising_count, 5223)
+        self.assertEqual(frame.seconds_since_boot, 10948)
+        self.assertIsNotNone(str(frame))
+
     def test_eddystone_tlm_enc(self):
         """Test encrypted TLM frame."""
         enc_tlm_packet = b"\x02\x01\x06\x03\x03\xaa\xfe\x11\x16\xaa\xfe\x20\x01\x41\x41\x41" \
@@ -125,6 +137,7 @@ class TestParser(unittest.TestCase):
         self.assertEqual(frame.has_firmware_error, False)
         self.assertEqual(frame.has_clock_error, True)
         self.assertEqual(frame.pressure, None)
+        self.assertIsNotNone(str(frame))
 
     def test_estimote_telemetry_a2(self):
         telemetry_a_packet = b"\x02\x01\x04\x03\x03\x9a\xfe\x17\x16\x9a\xfe\x12\x47\xa0\x38\xd5"\
@@ -141,6 +154,7 @@ class TestParser(unittest.TestCase):
         self.assertEqual(frame.has_firmware_error, True)
         self.assertEqual(frame.has_clock_error, False)
         self.assertEqual(frame.pressure, None)
+        self.assertIsNotNone(str(frame))
 
     def test_estimote_telemetry_a3(self):
         telemetry_a_packet = b"\x02\x01\x04\x03\x03\x9a\xfe\x17\x16\x9a\xfe\x02\x47\xa0\x38\xd5"\
@@ -157,6 +171,7 @@ class TestParser(unittest.TestCase):
         self.assertEqual(frame.has_firmware_error, None)
         self.assertEqual(frame.has_clock_error, None)
         self.assertEqual(frame.pressure, None)
+        self.assertIsNotNone(str(frame))
 
     def test_estimote_telemetry_b(self):
         telemetry_b_packet = b"\x02\x01\x04\x03\x03\x9a\xfe\x17\x16\x9a\xfe\x22\x47\xa0\x38\xd5"\
@@ -172,6 +187,7 @@ class TestParser(unittest.TestCase):
         self.assertEqual(frame.has_firmware_error, None)
         self.assertEqual(frame.has_clock_error, None)
         self.assertEqual(frame.battery_level, 80)
+        self.assertIsNotNone(str(frame))
 
     def test_estimote_telemetry_b2(self):
         telemetry_b_packet = b"\x02\x01\x04\x03\x03\x9a\xfe\x17\x16\x9a\xfe\x22\x47\xa0\x38\xd5"\
@@ -187,6 +203,7 @@ class TestParser(unittest.TestCase):
         self.assertEqual(frame.has_firmware_error, None)
         self.assertEqual(frame.has_clock_error, None)
         self.assertEqual(frame.battery_level, 80)
+        self.assertIsNotNone(str(frame))
 
     def test_estimote_telemetry_b3(self):
         telemetry_b_packet = b"\x02\x01\x04\x03\x03\x9a\xfe\x17\x16\x9a\xfe\x02\x47\xa0\x38\xd5"\
@@ -202,3 +219,4 @@ class TestParser(unittest.TestCase):
         self.assertEqual(frame.has_firmware_error, True)
         self.assertEqual(frame.has_clock_error, True)
         self.assertEqual(frame.battery_level, None)
+        self.assertIsNotNone(str(frame))

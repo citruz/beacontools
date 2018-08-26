@@ -3,6 +3,7 @@ from enum import IntEnum
 
 # for scanner
 class ScannerMode(IntEnum):
+    """Used to determine which packets should be parsed by the scanner."""
     MODE_NONE = 0
     MODE_IBEACON = 1
     MODE_EDDYSTONE = 2

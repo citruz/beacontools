@@ -17,6 +17,13 @@ class TestScanner(unittest.TestCase):
         # mock import so that tests can run without PyBluez installed
         sys.modules['bluetooth._bluetooth'] = MagicMock()
 
+    def test_invalid_device_filters(self):
+        """Test creation of device filters without arguments"""
+        filters = [EddystoneFilter, IBeaconFilter, EstimoteFilter]
+        for filter in filters:
+            with self.assertRaises(ValueError):
+                filter()
+
     def test_bad_arguments(self):
         """Test if wrong filters result in ValueError."""
         tests = [
@@ -289,9 +296,9 @@ class TestScanner(unittest.TestCase):
         scanner._mon.process_packet(pkt)
         self.assertEqual(callback.call_count, 1)
 
-    def test_multiple_filters(self):
+    def test_multiple_filters2(self):
         callback = MagicMock()
-        scanner = BeaconScanner(callback, device_filter=[EstimoteFilter(protocol_version=2), EddystoneFilter(instance="000000000001")],
+        scanner = BeaconScanner(callback, device_filter=[EstimoteFilter(identifier="47a038d5eb032640", protocol_version=2), EddystoneFilter(instance="000000000001")],
             packet_filter=[EstimoteTelemetryFrameB, EddystoneUIDFrame])
         pkt = b"\x41\x3e\x41\x02\x01\x03\x01\x35\x94\xef\xcd\xd6\x1c\x19\x02\x01\x04\x03\x03\x9a"\
               b"\xfe\x17\x16\x9a\xfe\x22\x47\xa0\x38\xd5\xeb\x03\x26\x40\x01\xff\xff\xff\xff\x49"\
@@ -304,6 +311,10 @@ class TestScanner(unittest.TestCase):
         pkt = b"\x41\x3e\x41\x02\x01\x03\x01\x35\x94\xef\xcd\xd6\x1c\x19\x02\x01\x06\x03\x03\xaa"\
               b"\xfe\x11\x16\xaa\xfe\x00\xe3\x12\x34\x56\x78\x90\x12\x34\x67\x89\x01\x00\x00\x00"\
               b"\x00\x00\x01\x00\x00\xdd"
+        scanner._mon.process_packet(pkt)
+        pkt = b"\x41\x3e\x41\x02\x01\x03\x01\x35\x94\xef\xcd\xd6\x1c\x19\x02\x01\x06\x03\x03\xaa"\
+              b"\xfe\x11\x16\xaa\xfe\x00\xe3\x12\x34\x56\x78\x90\x12\x34\x67\x89\x01\x00\x00\x00"\
+              b"\x00\x00\x02\x00\x00\xdd"
         scanner._mon.process_packet(pkt)
         pkt = b"\x41\x3e\x41\x02\x01\x03\x01\x35\x94\xef\xcd\xd6\x1c\x19\x02\x01\x06\x03\x03\xaa"\
               b"\xfe\x11\x16\xaa\xfe\x00\xe3\x12\x34\x56\x78\x90\x12\x34\x67\x89\x01\x00\x00\x00"\
