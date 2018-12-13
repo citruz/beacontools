@@ -1,5 +1,8 @@
 """Filters passed to the BeaconScanner to filter results."""
 
+from .utils import is_valid_mac
+
+
 class DeviceFilter(object):
     """Base class for all device filters. Should not be used by itself."""
 
@@ -21,20 +24,27 @@ class DeviceFilter(object):
 
         return found_one
 
+    def __repr__(self):
+        return "{}({})".format(
+            self.__class__.__name__,
+            ", ".join(["=".join((k, str(v),)) for k, v in self.properties.items()]))
+
+
 class IBeaconFilter(DeviceFilter):
     """Filter for iBeacon."""
 
     def __init__(self, uuid=None, major=None, minor=None):
         """Initialize filter."""
         super(IBeaconFilter, self).__init__()
-        if not uuid and not major and not minor:
+        if uuid is None and major is None and minor is None:
             raise ValueError("IBeaconFilter needs at least one argument set")
-        if uuid:
+        if uuid is not None:
             self.properties['uuid'] = uuid
-        if major:
+        if major is not None:
             self.properties['major'] = major
-        if minor:
+        if minor is not None:
             self.properties['minor'] = minor
+
 
 class EddystoneFilter(DeviceFilter):
     """Filter for Eddystone beacons."""
@@ -42,12 +52,13 @@ class EddystoneFilter(DeviceFilter):
     def __init__(self, namespace=None, instance=None):
         """Initialize filter."""
         super(EddystoneFilter, self).__init__()
-        if not namespace and not instance:
+        if namespace is None and instance is None:
             raise ValueError("EddystoneFilter needs at least one argument set")
-        if namespace:
+        if namespace is not None:
             self.properties['namespace'] = namespace
-        if instance:
+        if instance is not None:
             self.properties['instance'] = instance
+
 
 class EstimoteFilter(DeviceFilter):
     """Filter for Estimote beacons."""
@@ -55,12 +66,13 @@ class EstimoteFilter(DeviceFilter):
     def __init__(self, identifier=None, protocol_version=None):
         """Initialize filter."""
         super(EstimoteFilter, self).__init__()
-        if not identifier and not protocol_version:
+        if identifier is None and protocol_version is None:
             raise ValueError("EstimoteFilter needs at least one argument set")
-        if identifier:
+        if identifier is not None:
             self.properties['identifier'] = identifier
-        if protocol_version:
+        if protocol_version is not None:
             self.properties['protocol_version'] = protocol_version
+
 
 class BtAddrFilter(DeviceFilter):
     """Filter by bluetooth address."""
@@ -68,6 +80,11 @@ class BtAddrFilter(DeviceFilter):
     def __init__(self, bt_addr):
         """Initialize filter."""
         super(BtAddrFilter, self).__init__()
-        if not bt_addr or len(bt_addr) != 17:
-            raise ValueError("Invalid bluetooth given, need to be in format aa:bb:cc:dd:ee:ff")
+        try:
+            bt_addr = bt_addr.lower()
+        except AttributeError:
+            raise ValueError("bt_addr({}) wasn't a string".format(bt_addr))
+        if not is_valid_mac(bt_addr):
+            raise ValueError("Invalid bluetooth MAC address given,"
+                             " format should match aa:bb:cc:dd:ee:ff")
         self.properties['bt_addr'] = bt_addr
