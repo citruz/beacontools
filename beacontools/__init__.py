@@ -8,3 +8,4 @@ from .packet_types.eddystone import EddystoneUIDFrame, EddystoneURLFrame, \
 from .packet_types.ibeacon import IBeaconAdvertisement
 from .packet_types.estimote import EstimoteTelemetryFrameA, EstimoteTelemetryFrameB
 from .device_filters import IBeaconFilter, EddystoneFilter, BtAddrFilter, EstimoteFilter
+from .utils import is_valid_mac
