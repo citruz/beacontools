@@ -95,19 +95,22 @@ Changelog
 ---------
 Beacontools follows the `semantic versioning <https://semver.org/>`__ scheme.
 
+* 1.3.1
+    * Multiple fixes and internal refactorings, including support for Raspberry Pi 3B+ (huge thanks to `cereal <https://github.com/cereal>`__)
+    * Updated dependencies
 * 1.3.0
     * Added support for Estimote Telemetry packets (see examples/parser_example.py)
     * Relaxed parsing constraints for RFU and flags field
     * Added temperature output in 8.8 fixed point decimal format for Eddystone TLM
 * 1.2.4
     * Added support for Eddystone packets with Flags Data set to 0x1a (thanks to `AndreasTornes <https://github.com/AndreasTornes>`__)
-    * Updated depedencies
+    * Updated dependencies
 * 1.2.3
     * Fixed compatibility with construct >=2.9.41
 * 1.2.2
     * Moved import of bluez so that the library can be used in parsing-only mode, without having bluez installed.
 * 1.2.1
-    * Updated depedencies
+    * Updated dependencies
 * 1.2.0
     * Added support for Cypress iBeacons which transmit temp and humidity embedded in the minor value (thanks to `darkskiez <https://github.com/darkskiez>`__)
     * Updated dependencies
