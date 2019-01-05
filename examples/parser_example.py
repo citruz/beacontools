@@ -85,3 +85,14 @@ print("Protocol Version: %d" % telemetry_b.protocol_version)
 print("Magnetic field: (%f, %f, %f)" % telemetry_b.magnetic_field)
 print("Temperature: %f °C" % telemetry_b.temperature)
 # ... see packet_types/estimote.py for all available attributes and units
+
+# Estimote Nearable Advertisement
+nearable_packet = b"\x04\x3e\x2b\x02\x01\x03\x01\x06\xec\x83\x28\x6e\xfa\x1f\x02\x01" \
+                  b"\x04\x03\x03\x0f\x18\x17\xff\x5d\x01\x01\x1e\xfe\x42\x7e\xb6\xf4" \
+                  b"\xbc\x2f\x04\x01\x68\xa1\xaa\xfe\x05\xc1\x45\x25\x53\xb5"
+nearable_adv = parse_packet(nearable_packet)
+print("Identifier: %s" % nearable_adv.identifier)
+print("Hardware_version: %d" % nearable_adv.hardware_version)
+print("Firmware_version: %d" % nearable_adv.firmware_version)
+print("Temperature: %d" % nearable_adv.temperature)
+print("Is moving: %i" % nearable_adv.is_moving)

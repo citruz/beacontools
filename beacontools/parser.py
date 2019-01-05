@@ -1,21 +1,28 @@
 """Beacon advertisement parser."""
 from construct import ConstructError
 
-from .structs import LTVFrame, IBeaconAdvertisingPacket
+from .structs import LTVFrame, IBeaconAdvertisingPacket, EstimoteNearableFrame
 from .packet_types import EddystoneUIDFrame, EddystoneURLFrame, EddystoneEncryptedTLMFrame, \
                           EddystoneTLMFrame, EddystoneEIDFrame, IBeaconAdvertisement, \
-                          EstimoteTelemetryFrameA, EstimoteTelemetryFrameB
+                          EstimoteTelemetryFrameA, EstimoteTelemetryFrameB, EstimoteNearable
 from .const import EDDYSTONE_TLM_UNENCRYPTED, EDDYSTONE_TLM_ENCRYPTED, SERVICE_DATA_TYPE, \
-                   EDDYSTONE_UID_FRAME, EDDYSTONE_TLM_FRAME, EDDYSTONE_URL_FRAME, \
-                   EDDYSTONE_EID_FRAME, EDDYSTONE_UUID, ESTIMOTE_UUID, ESTIMOTE_TELEMETRY_FRAME, \
-                   ESTIMOTE_TELEMETRY_SUBFRAME_A, ESTIMOTE_TELEMETRY_SUBFRAME_B
+    EDDYSTONE_UID_FRAME, EDDYSTONE_TLM_FRAME, EDDYSTONE_URL_FRAME, \
+    EDDYSTONE_EID_FRAME, EDDYSTONE_UUID, ESTIMOTE_UUID, ESTIMOTE_TELEMETRY_FRAME, \
+    ESTIMOTE_TELEMETRY_SUBFRAME_A, ESTIMOTE_TELEMETRY_SUBFRAME_B
 
 
 def parse_packet(packet):
     """Parse a beacon advertisement packet."""
     frame = parse_ltv_packet(packet)
+
     if frame is None:
         frame = parse_ibeacon_packet(packet)
+
+    if frame is None:
+        frame = parse_estimote_nearable_packet(packet[23:-1])
+        if frame is not None:
+            print("estimote_nearable = " + str(frame))
+
     return frame
 
 def parse_ltv_packet(packet):
@@ -36,6 +43,15 @@ def parse_ltv_packet(packet):
         return None
 
     return None
+
+def parse_estimote_nearable_packet(packet):
+    """Parse an ibeacon beacon advertisement packet."""
+    try:
+        pkt = EstimoteNearableFrame.parse(packet)
+        return EstimoteNearable(pkt)
+
+    except ConstructError:
+        return None
 
 def parse_eddystone_service_data(data):
     """Parse Eddystone service data."""
