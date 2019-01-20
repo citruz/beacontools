@@ -19,7 +19,7 @@ def parse_packet(packet):
         frame = parse_ibeacon_packet(packet)
 
     if frame is None:
-        frame = parse_estimote_nearable_packet(packet[23:-1])
+        frame = parse_estimote_nearable_packet(packet[9:-1])
         if frame is not None:
             print("estimote_nearable = " + str(frame))
 
