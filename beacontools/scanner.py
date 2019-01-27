@@ -117,6 +117,7 @@ class Monitor(threading.Thread):
         if not ( \
             ((self.mode & ScannerMode.MODE_IBEACON) and (pkt[19:23] == b"\x4c\x00\x02\x15")) or \
             ((self.mode & ScannerMode.MODE_EDDYSTONE) and (pkt[19:21] == b"\xaa\xfe")) or \
+            ((self.mode & ScannerMode.MODE_ESTIMOTE) and (pkt[23:25] == b"\x5d\x01")) or \
             ((self.mode & ScannerMode.MODE_ESTIMOTE) and (pkt[19:21] == b"\x9a\xfe"))):
             return
 

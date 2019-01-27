@@ -253,7 +253,6 @@ class EstimoteNearable(object):
         self._temperature = temperature
         self._is_moving = data['is_moving'] & 0b01000000 != 0
         #   var isMoving = (data.readUInt8(15) & 0b01000000) != 0;
-        print ("New Nearable Packet")
 
     @property
     def identifier(self):
@@ -279,3 +278,12 @@ class EstimoteNearable(object):
     def is_moving(self):
         """Whether the beacon is in motion at the moment."""
         return self._is_moving
+
+    @property
+    def properties(self):
+        """Get beacon properties."""
+        return {'identifier': self.identifier, 'temperature': self.temperature, 'is_moving': self._is_moving}
+
+    def __str__(self):
+        return "EstimoteNearable<identifier: %s>" \
+               % self.identifier
