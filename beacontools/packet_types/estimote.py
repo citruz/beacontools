@@ -237,6 +237,7 @@ class EstimoteTelemetryFrameB(object):
 
 class EstimoteNearable(object):
     """EstimoteNearable advertisement."""
+
     def __init__(self, data):
         """init"""
         self._identifier = data_to_hexstring(data['identifier'])
@@ -248,7 +249,6 @@ class EstimoteNearable(object):
         if temperature_raw_value > 2047:
             # convert a 12-bit unsigned integer to a signed one
             temperature_raw_value = temperature_raw_value - 4096
-            print("Converted: " + str(temperature_raw_value))
         temperature = temperature_raw_value / 16.0
         self._temperature = temperature
         self._is_moving = data['is_moving'] & 0b01000000 != 0
@@ -282,7 +282,8 @@ class EstimoteNearable(object):
     @property
     def properties(self):
         """Get beacon properties."""
-        return {'identifier': self.identifier, 'temperature': self.temperature, 'is_moving': self._is_moving}
+        return {'identifier': self.identifier, 'temperature': self.temperature,
+                'is_moving': self._is_moving}
 
     def __str__(self):
         return "EstimoteNearable<identifier: %s>" \
