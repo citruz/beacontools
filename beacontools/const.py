@@ -1,6 +1,7 @@
 """Constants."""
 from enum import IntEnum
 
+
 # for scanner
 class ScannerMode(IntEnum):
     """Used to determine which packets should be parsed by the scanner."""
@@ -10,8 +11,32 @@ class ScannerMode(IntEnum):
     MODE_ESTIMOTE = 4
     MODE_ALL = MODE_IBEACON | MODE_EDDYSTONE | MODE_ESTIMOTE
 
+
+# hci le scan parameters
+class ScanType(IntEnum):
+    """Determines which type of scan should be executed."""
+    PASSIVE = 0x00
+    ACTIVE = 0x01
+
+
+class ScanFilter(IntEnum):
+    """Determines if only white-listed MAC addresses will be filtered or not"""
+    ALL = 0x00
+    WHITELIST_ONLY = 0x01
+
+
+class BluetoothAddressType(IntEnum):
+    """Determines the scanner MAC-address"""
+    PUBLIC = 0x00  # with device MAC-address
+    RANDOM = 0x01  # with a random MAC-address
+
+
+# used for window and interval (i.e. 0x10 * 0.625 = 10ms, 10ms / 0.625 = 0x10)
+MS_FRACTION_DIVIDER = 0.625
+
 LE_META_EVENT = 0x3e
 OGF_LE_CTL = 0x08
+OCF_LE_SET_SCAN_PARAMETERS = 0x000B
 OCF_LE_SET_SCAN_ENABLE = 0x000C
 EVT_LE_ADVERTISING_REPORT = 0x02
 
