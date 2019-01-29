@@ -1,5 +1,6 @@
 """All low level structures used for parsing Estimote packets."""
-from construct import Struct, Byte, Switch, Int8sl, Array, Int8ul, Int16ub, Const, Int16ul
+from construct import Struct, Byte, Switch, Int8sl, Array, Int8ul, Const, Int16ul
+
 from ..const import ESTIMOTE_TELEMETRY_SUBFRAME_A, ESTIMOTE_TELEMETRY_SUBFRAME_B, ESTIMOTE_NEARABLE_FRAME, \
     ESTIMOTE_MANUFACTURER_BYTES
 
