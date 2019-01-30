@@ -5,7 +5,6 @@ from ..utils import mulaw_to_value, data_to_binstring
 class CJMonitorAdvertisement(object):
     """CJ Monitor advertisement."""
 
-
     def __init__(self, data):
         self._company_id = data['company_id']
         self._beacon_type = data['beacon_type']
@@ -47,7 +46,15 @@ class CJMonitorAdvertisement(object):
     @property
     def properties(self):
         """Get Monitor properties."""
-        return {'name': self.name, 'temperature': self.temperature, 'humidity': self.humidity, 'light': self.light, 'company_id': self.company_id, 'beacon_type': self.beacon_type }
+        return {'name': self.name,
+                'temperature': self.temperature,
+                'humidity': self.humidity,
+                'light': self.light,
+                'company_id': self.company_id,
+                'beacon_type': self.beacon_type}
 
     def __str__(self):
-        return "CJMonitorAdvertisement<name: {name}, temp: {temperature:.1f}, humidity: {humidity:d}, light: {light:.0f}>".format(name=self.name, temperature=self.temperature, humidity=self.humidity, light=self.light)
+        return "CJMonitorAdvertisement<name: {name}, temp: {temperature:.1f}," \
+               "humidity: {humidity:d}, light: {light:.0f}>".format(
+            name=self.name, temperature=self.temperature,
+            humidity=self.humidity, light=self.light)
