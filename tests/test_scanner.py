@@ -135,7 +135,7 @@ class TestScanner(unittest.TestCase):
             {"beacon_type": CJ_TEMPHUM_TYPE,
              "company_id": CJ_MANUF_ID,
              'name': 'Mon 5643',
-             'light': 15.99,
+             'light': 159.9,
              "temperature": 32.6,
              "humidity": 55},
             args[3])

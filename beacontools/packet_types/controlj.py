@@ -11,7 +11,7 @@ class CJMonitorAdvertisement(object):
         self._temperature = data['temperature'] / 100.0
         self._humidity = data['humidity']
         self._light = mulaw_to_value(data['light']) / 10.0
-        self._name = data_to_binstring(data['name']).decode("utf-8")
+        self._name = data_to_binstring(data['name']).decode("ascii")
 
     @property
     def name(self):
