@@ -231,4 +231,6 @@ class TestParser(unittest.TestCase):
         self.assertIsInstance(frame, EstimoteNearable)
         self.assertEqual("1efe427eb6f4bc2f", frame.identifier)
         self.assertEqual(22.5, frame.temperature)
+        self.assertEqual(1, frame.firmware_version)
+        self.assertEqual(4, frame.hardware_version)
         self.assertFalse(frame.is_moving)
