@@ -133,6 +133,8 @@ class TestScanner(unittest.TestCase):
         self.assertEqual("00:0b:57:5b:56:43", args[0])
         self.assertEqual(-86, args[1])
         self.assertIsInstance(args[2], CJMonitorAdvertisement)
+        self.assertEqual('CJMonitorAdvertisement<name: Mon 5643, temp: 32.6,humidity: 55, light: 160>',
+                         str(args[2]))
         self.assertEqual(
             {"beacon_type": CJ_TEMPHUM_TYPE,
              "company_id": CJ_MANUF_ID,
@@ -141,6 +143,10 @@ class TestScanner(unittest.TestCase):
              "temperature": 32.6,
              "humidity": 55},
             args[3])
+        # Test same packet with different beacon type, should be ignored.
+        scanner = BeaconScanner(callback, device_filter=CJMonitorFilter(beacon_type=4351))
+        scanner._mon.process_packet(pkt)
+        self.assertEqual(1, callback.call_count)
 
     def test_process_packet_dev_packet(self):
         """Test processing of a packet and callback execution with device and packet filter."""
