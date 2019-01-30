@@ -56,5 +56,5 @@ class CJMonitorAdvertisement(object):
     def __str__(self):
         return "CJMonitorAdvertisement<name: {name}, temp: {temperature:.1f}," \
                "humidity: {humidity:d}, light: {light:.0f}>".format(
-            name=self.name, temperature=self.temperature,
-            humidity=self.humidity, light=self.light)
+                   name=self.name, temperature=self.temperature,
+                   humidity=self.humidity, light=self.light)
