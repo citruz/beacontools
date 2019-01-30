@@ -1,4 +1,4 @@
-"""Packet classes for iBeacon beacons."""
+"""Packet classes for Control-J Monitors."""
 from ..utils import mulaw_to_value, data_to_binstring
 
 
