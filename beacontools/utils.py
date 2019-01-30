@@ -34,7 +34,7 @@ def data_to_binstring(data):
 def mulaw_to_value(mudata):
     """Convert a mu-law encoded value to linear."""
     position = ((mudata & 0xF0) >> 4) + 5
-    return ((1 << position) | ((mudata & 0xF) << (position - 4)) | (1 << (position - 5)) - 33)
+    return ((1 << position) | ((mudata & 0xF) << (position - 4)) | (1 << (position - 5))) - 33
 
 def bt_addr_to_string(addr):
     """Convert a binary string to the hex representation."""

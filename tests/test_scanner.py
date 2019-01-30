@@ -1,6 +1,9 @@
 """Test the scanner component."""
 import sys
 import unittest
+
+from beacontools.const import CJ_TEMPHUM_TYPE, CJ_MANUF_ID
+
 try:
     from unittest.mock import MagicMock
 except ImportError:
@@ -8,7 +11,7 @@ except ImportError:
 
 from beacontools import BeaconScanner, EddystoneFilter, EddystoneTLMFrame, EddystoneUIDFrame, \
                         BtAddrFilter, IBeaconFilter, IBeaconAdvertisement, EstimoteFilter, \
-                        EstimoteTelemetryFrameB, EstimoteTelemetryFrameA
+                        EstimoteTelemetryFrameB, EstimoteTelemetryFrameA, CJMonitorFilter, CJMonitorAdvertisement
 
 class TestScanner(unittest.TestCase):
     """Test the BeaconScanner."""
@@ -113,6 +116,29 @@ class TestScanner(unittest.TestCase):
             "major":1,
             "minor":2
         })
+
+    def test_process_packet_dev_filter4(self):
+        """Test processing of a packet and callback execution with cj Monitor device filter."""
+        callback = MagicMock()
+        scanner = BeaconScanner(callback, device_filter=CJMonitorFilter())
+        pkt = b"\x04\x3e\x29\x02\x01\x00\x00\x43\x56\x5b\x57\x0b\x00\x1d" \
+              b"\x02\x01\x06\x05\x02\x1a\x18\x00\x18" \
+              b"\x09\xff\x72\x04\xfe\x10\xbc\x0c\x37\x59" \
+              b"\x09\x09\x4d\x6f\x6e\x20\x35\x36\x34\x33\xaa"
+        scanner._mon.process_packet(pkt)
+        self.assertEqual(1, callback.call_count)
+        args = callback.call_args[0]
+        self.assertEqual("00:0b:57:5b:56:43", args[0])
+        self.assertEqual(-86, args[1])
+        self.assertIsInstance(args[2], CJMonitorAdvertisement)
+        self.assertEqual(
+            {"beacon_type": CJ_TEMPHUM_TYPE,
+             "company_id": CJ_MANUF_ID,
+             'name': 'Mon 5643',
+             'light': 15.99,
+             "temperature": 32.6,
+             "humidity": 55},
+            args[3])
 
     def test_process_packet_dev_packet(self):
         """Test processing of a packet and callback execution with device and packet filter."""

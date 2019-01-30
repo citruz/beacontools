@@ -1,6 +1,5 @@
 """All low level structures used for parsing control-j Monitor packets."""
-from construct import Struct, BitStruct, Flag, BitsInteger, Const, Int8ul, Int16ul, Switch, Array, Byte, Bytes, \
-    GreedyString
+from construct import Struct, BitStruct, Flag, BitsInteger, Const, Int8ul, Int16ul, Array, Byte
 
 # pylint: disable=invalid-name
 
