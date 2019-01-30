@@ -41,6 +41,8 @@ class TestScanner(unittest.TestCase):
         for dev_filter, pkt_filter in tests:
             with self.assertRaises(ValueError):
                 BeaconScanner(None, 0, dev_filter, pkt_filter)
+        with self.assertRaises(ValueError):
+            CJMonitorFilter(company_id=None, beacon_type=None)
 
     def test_good_arguments(self):
         """Test if correct filters result in no exception."""
