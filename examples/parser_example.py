@@ -2,6 +2,8 @@
 from beacontools import parse_packet
 
 # Eddystone UID packet
+from beacontools.parser import parse_cjmonitor_packet
+
 uid_packet = b"\x02\x01\x06\x03\x03\xaa\xfe\x17\x16\xaa\xfe\x00\xe3\x12\x34\x56\x78\x90\x12" \
              b"\x34\x67\x89\x01\x00\x00\x00\x00\x00\x01\x00\x00"
 uid_frame = parse_packet(uid_packet)
@@ -65,7 +67,7 @@ print("TX Power: %d" % sensor.tx_power)
 print("-----")
 
 # Estimote Telemetry Packet (Subframe A)
-telemetry_a_packet = b"\x02\x01\x04\x03\x03\x9a\xfe\x17\x16\x9a\xfe\x22\x47\xa0\x38\xd5"\
+telemetry_a_packet = b"\x02\x01\x04\x03\x03\x9a\xfe\x17\x16\x9a\xfe\x22\x47\xa0\x38\xd5" \
                      b"\xeb\x03\x26\x40\x00\x00\x01\x41\x44\x47\xfa\xff\xff\xff\xff"
 telemetry = parse_packet(telemetry_a_packet)
 print("Identifier: %s" % telemetry.identifier)
@@ -77,7 +79,7 @@ print("Is moving: %s" % telemetry.is_moving)
 print("-----")
 
 # Estimote Telemetry Packet (Subframe B)
-telemetry_b_packet = b"\x02\x01\x04\x03\x03\x9a\xfe\x17\x16\x9a\xfe\x22\x47\xa0\x38\xd5"\
+telemetry_b_packet = b"\x02\x01\x04\x03\x03\x9a\xfe\x17\x16\x9a\xfe\x22\x47\xa0\x38\xd5" \
                      b"\xeb\x03\x26\x40\x01\xd8\x42\xed\x73\x49\x25\x66\xbc\x2e\x50"
 telemetry_b = parse_packet(telemetry_b_packet)
 print("Identifier: %s" % telemetry_b.identifier)
@@ -85,3 +87,13 @@ print("Protocol Version: %d" % telemetry_b.protocol_version)
 print("Magnetic field: (%f, %f, %f)" % telemetry_b.magnetic_field)
 print("Temperature: %f °C" % telemetry_b.temperature)
 # ... see packet_types/estimote.py for all available attributes and units
+
+print("-----")
+
+# CJ Monitor packet
+
+cj_monitor_packet = b"\x02\x01\x06\x05\x02\x1A\x18\x00\x18" \
+                    b"\x09\xFF\x72\x04\xFE\x10\xD1\x0C\x33\x61" \
+                    b"\x09\x09\x4D\x6F\x6E\x20\x35\x36\x34\x33"
+cj_monitor = parse_cjmonitor_packet(cj_monitor_packet)
+print(cj_monitor)

@@ -1,14 +1,14 @@
 """Beacon advertisement parser."""
 from construct import ConstructError
 
-from .structs import LTVFrame, IBeaconAdvertisingPacket
+from .structs import LTVFrame, IBeaconAdvertisingPacket, CJMonitorAdvertisingPacket
 from .packet_types import EddystoneUIDFrame, EddystoneURLFrame, EddystoneEncryptedTLMFrame, \
-                          EddystoneTLMFrame, EddystoneEIDFrame, IBeaconAdvertisement, \
-                          EstimoteTelemetryFrameA, EstimoteTelemetryFrameB
+    EddystoneTLMFrame, EddystoneEIDFrame, IBeaconAdvertisement, \
+    EstimoteTelemetryFrameA, EstimoteTelemetryFrameB, CJMonitorAdvertisement
 from .const import EDDYSTONE_TLM_UNENCRYPTED, EDDYSTONE_TLM_ENCRYPTED, SERVICE_DATA_TYPE, \
-                   EDDYSTONE_UID_FRAME, EDDYSTONE_TLM_FRAME, EDDYSTONE_URL_FRAME, \
-                   EDDYSTONE_EID_FRAME, EDDYSTONE_UUID, ESTIMOTE_UUID, ESTIMOTE_TELEMETRY_FRAME, \
-                   ESTIMOTE_TELEMETRY_SUBFRAME_A, ESTIMOTE_TELEMETRY_SUBFRAME_B
+    EDDYSTONE_UID_FRAME, EDDYSTONE_TLM_FRAME, EDDYSTONE_URL_FRAME, \
+    EDDYSTONE_EID_FRAME, EDDYSTONE_UUID, ESTIMOTE_UUID, ESTIMOTE_TELEMETRY_FRAME, \
+    ESTIMOTE_TELEMETRY_SUBFRAME_A, ESTIMOTE_TELEMETRY_SUBFRAME_B
 
 
 def parse_packet(packet):
@@ -16,7 +16,10 @@ def parse_packet(packet):
     frame = parse_ltv_packet(packet)
     if frame is None:
         frame = parse_ibeacon_packet(packet)
+    if frame is None:
+        frame = parse_cjmonitor_packet(packet)
     return frame
+
 
 def parse_ltv_packet(packet):
     """Parse a tag-length-value style beacon packet."""
@@ -37,6 +40,7 @@ def parse_ltv_packet(packet):
 
     return None
 
+
 def parse_eddystone_service_data(data):
     """Parse Eddystone service data."""
     if data['frame_type'] == EDDYSTONE_UID_FRAME:
@@ -56,6 +60,7 @@ def parse_eddystone_service_data(data):
     else:
         return None
 
+
 def parse_estimote_service_data(data):
     """Parse Estimote service data."""
     if data['frame_type'] & 0xF == ESTIMOTE_TELEMETRY_FRAME:
@@ -66,11 +71,22 @@ def parse_estimote_service_data(data):
             return EstimoteTelemetryFrameB(data['frame'], protocol_version)
     return None
 
+
 def parse_ibeacon_packet(packet):
     """Parse an ibeacon beacon advertisement packet."""
     try:
         pkt = IBeaconAdvertisingPacket.parse(packet)
         return IBeaconAdvertisement(pkt)
+
+    except ConstructError:
+        return None
+
+
+def parse_cjmonitor_packet(packet):
+    """Parse an CJ Monitor  advertisement packet."""
+    try:
+        pkt = CJMonitorAdvertisingPacket.parse(packet)
+        return CJMonitorAdvertisement(pkt)
 
     except ConstructError:
         return None

@@ -31,6 +31,10 @@ def data_to_binstring(data):
     """Convert an array of binary data to a binary string."""
     return array.array('B', data).tostring()
 
+def mulaw_to_value(mudata):
+    """Convert a mu-law encoded value to linear."""
+    position = ((mudata & 0xF0) >> 4) + 5
+    return ((1 << position) | ((mudata & 0xF) << (position - 4)) | (1 << (position - 5)) - 33)
 
 def bt_addr_to_string(addr):
     """Convert a binary string to the hex representation."""
@@ -78,7 +82,7 @@ def bin_to_int(string):
 
 def get_mode(device_filter):
     """Determine which beacons the scanner should look for."""
-    from .device_filters import IBeaconFilter, EddystoneFilter, BtAddrFilter, EstimoteFilter
+    from .device_filters import IBeaconFilter, EddystoneFilter, BtAddrFilter, EstimoteFilter, CJMonitorFilter
     if device_filter is None or len(device_filter) == 0:
         return ScannerMode.MODE_ALL
 
@@ -90,6 +94,8 @@ def get_mode(device_filter):
             mode |= ScannerMode.MODE_EDDYSTONE
         elif isinstance(filtr, EstimoteFilter):
             mode |= ScannerMode.MODE_ESTIMOTE
+        elif isinstance(filtr, CJMonitorFilter):
+            mode |= ScannerMode.MODE_CJMONITOR
         elif isinstance(filtr, BtAddrFilter):
             mode |= ScannerMode.MODE_ALL
             break
