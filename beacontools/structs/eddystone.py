@@ -1,13 +1,12 @@
 """All low level structures used for parsing eddystone packets."""
 from construct import Struct, Byte, Switch, OneOf, Int8sl, Array, \
                       Int16ul, Int16ub, Int32ub, GreedyString, GreedyRange, \
-                      Bytes
+                      Bytes, BitStruct, BitsInteger, Flag
 
 from ..const import EDDYSTONE_UUID, EDDYSTONE_URL_SCHEMES, EDDYSTONE_TLM_UNENCRYPTED, \
                     EDDYSTONE_TLM_ENCRYPTED, EDDYSTONE_UID_FRAME, EDDYSTONE_URL_FRAME, \
                     EDDYSTONE_TLM_FRAME, EDDYSTONE_EID_FRAME, FLAGS_DATA_TYPE, \
-                    SERVICE_DATA_TYPE, SERVICE_UUIDS_DATA_TYPE, ESTIMOTE_UUID, \
-                    ESTIMOTE_TELEMETRY_FRAME
+                    SERVICE_DATA_TYPE, ESTIMOTE_UUID, ESTIMOTE_TELEMETRY_FRAME
 
 from .estimote import EstimoteTelemetryFrame
 
@@ -75,10 +74,16 @@ LTV = Struct(
     "length" / Byte,
     "type" / Byte,
     "value" / Switch(lambda ctx: ctx.type, {
-        FLAGS_DATA_TYPE: Array(lambda ctx: ctx.length -1, Byte),
-        SERVICE_UUIDS_DATA_TYPE: OneOf(Bytes(2), [EDDYSTONE_UUID, ESTIMOTE_UUID]),
+        FLAGS_DATA_TYPE: BitStruct(
+            "reserved" / BitsInteger(3),
+            "le_br_edr_support_host" / Flag,
+            "le_br_edr_support_controller" / Flag,
+            "br_edr_not_supported" / Flag,
+            "le_general_discoverable_mode" / Flag,
+            "le_limited_discoverable_mode" / Flag,
+        ),
         SERVICE_DATA_TYPE: ServiceData
-    }, default=Array(lambda ctx: ctx.length -1, Byte)),
+    }, default=Array(lambda ctx: ctx.length - 1, Byte)),
 )
 
 LTVFrame = GreedyRange(LTV)
