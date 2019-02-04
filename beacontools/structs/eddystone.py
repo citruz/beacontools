@@ -6,7 +6,8 @@ from construct import Struct, Byte, Switch, OneOf, Int8sl, Array, \
 from ..const import EDDYSTONE_UUID, EDDYSTONE_URL_SCHEMES, EDDYSTONE_TLM_UNENCRYPTED, \
                     EDDYSTONE_TLM_ENCRYPTED, EDDYSTONE_UID_FRAME, EDDYSTONE_URL_FRAME, \
                     EDDYSTONE_TLM_FRAME, EDDYSTONE_EID_FRAME, FLAGS_DATA_TYPE, \
-                    SERVICE_DATA_TYPE, ESTIMOTE_UUID, ESTIMOTE_TELEMETRY_FRAME
+                    SERVICE_DATA_TYPE, COMPLETE_SERVICE_UUIDS_DATA_TYPE, ESTIMOTE_UUID, \
+                    ESTIMOTE_TELEMETRY_FRAME
 
 from .estimote import EstimoteTelemetryFrame
 
@@ -82,6 +83,7 @@ LTV = Struct(
             "le_general_discoverable_mode" / Flag,
             "le_limited_discoverable_mode" / Flag,
         ),
+        COMPLETE_SERVICE_UUIDS_DATA_TYPE: OneOf(Bytes(2), [EDDYSTONE_UUID, ESTIMOTE_UUID]),
         SERVICE_DATA_TYPE: ServiceData
     }, default=Array(lambda ctx: ctx.length - 1, Byte)),
 )
