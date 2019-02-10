@@ -106,4 +106,7 @@ cj_monitor_packet = b"\x02\x01\x06\x05\x02\x1A\x18\x00\x18" \
                     b"\x09\xFF\x72\x04\xFE\x10\xD1\x0C\x33\x61" \
                     b"\x09\x09\x4D\x6F\x6E\x20\x35\x36\x34\x33"
 cj_monitor = parse_packet(cj_monitor_packet)
-print(cj_monitor)
+print("Name: %s" % cj_monitor.name)
+print("Temperature: %f °C" % cj_monitor.temperature)
+print("Humidity: %d %%" % cj_monitor.humidity)
+print("Light: %f" % cj_monitor.light)

@@ -2,7 +2,7 @@
 import sys
 import unittest
 
-from beacontools.const import CJ_TEMPHUM_TYPE, CJ_MANUF_ID
+from beacontools.const import CJ_TEMPHUM_TYPE, CJ_MANUFACTURER_ID
 
 try:
     from unittest.mock import MagicMock
@@ -137,7 +137,7 @@ class TestScanner(unittest.TestCase):
                          str(args[2]))
         self.assertEqual(
             {"beacon_type": CJ_TEMPHUM_TYPE,
-             "company_id": CJ_MANUF_ID,
+             "company_id": CJ_MANUFACTURER_ID,
              'name': 'Mon 5643',
              'light': 159.9,
              "temperature": 32.6,

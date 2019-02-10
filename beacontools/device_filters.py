@@ -1,5 +1,5 @@
 """Filters passed to the BeaconScanner to filter results."""
-from beacontools.const import CJ_MANUF_ID, CJ_TEMPHUM_TYPE
+from .const import CJ_MANUFACTURER_ID, CJ_TEMPHUM_TYPE
 from .utils import is_valid_mac
 
 
@@ -33,7 +33,7 @@ class DeviceFilter(object):
 class CJMonitorFilter(DeviceFilter):
     """Filter for CJ Monitor."""
 
-    def __init__(self, company_id=CJ_MANUF_ID, beacon_type=CJ_TEMPHUM_TYPE):
+    def __init__(self, company_id=CJ_MANUFACTURER_ID, beacon_type=CJ_TEMPHUM_TYPE):
         """Initialize filter."""
         super(CJMonitorFilter, self).__init__()
         if company_id is None and beacon_type is None:
