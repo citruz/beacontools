@@ -1,15 +1,18 @@
 """Beacon advertisement parser."""
-from construct import ConstructError
+from construct import ConstructError, Struct, Byte, Switch, Array, Bytes, GreedyRange, OneOf
 
-from .structs import LTVFrame, IBeaconAdvertisingPacket, EstimoteNearableFrame
+from beacontools.structs.eddystone import ServiceData
+from .structs import IBeaconAdvertisingPacket, EstimoteNearableFrame
 from .packet_types import EddystoneUIDFrame, EddystoneURLFrame, EddystoneEncryptedTLMFrame, \
                           EddystoneTLMFrame, EddystoneEIDFrame, IBeaconAdvertisement, \
                           EstimoteTelemetryFrameA, EstimoteTelemetryFrameB, EstimoteNearable
 from .const import EDDYSTONE_TLM_UNENCRYPTED, EDDYSTONE_TLM_ENCRYPTED, SERVICE_DATA_TYPE, \
     EDDYSTONE_UID_FRAME, EDDYSTONE_TLM_FRAME, EDDYSTONE_URL_FRAME, \
     EDDYSTONE_EID_FRAME, EDDYSTONE_UUID, ESTIMOTE_UUID, ESTIMOTE_TELEMETRY_FRAME, \
-    ESTIMOTE_TELEMETRY_SUBFRAME_A, ESTIMOTE_TELEMETRY_SUBFRAME_B, MANUFACTURER_SPECIFIC_DATA
+    ESTIMOTE_TELEMETRY_SUBFRAME_A, ESTIMOTE_TELEMETRY_SUBFRAME_B, MANUFACTURER_SPECIFIC_DATA, \
+    FLAGS_DATA_TYPE, SERVICE_UUIDS_DATA_TYPE, ESTIMOTE_NEARABLE_BATTERY_SERVICE_UUID
 
+# pylint: disable=invalid-name
 
 def parse_packet(packet):
     """Parse a beacon advertisement packet."""
@@ -86,3 +89,18 @@ def parse_ibeacon_packet(packet):
 
     except ConstructError:
         return None
+
+
+LTV = Struct(
+    "length" / Byte,
+    "type" / Byte,
+    "value" / Switch(lambda ctx: ctx.type, {
+        FLAGS_DATA_TYPE: Array(lambda ctx: ctx.length -1, Byte),
+        SERVICE_UUIDS_DATA_TYPE: OneOf(Bytes(2), [EDDYSTONE_UUID,
+                                                  ESTIMOTE_UUID,
+                                                  ESTIMOTE_NEARABLE_BATTERY_SERVICE_UUID]),
+        SERVICE_DATA_TYPE: ServiceData
+    }, default=Array(lambda ctx: ctx.length -1, Byte)),
+)
+
+LTVFrame = GreedyRange(LTV)
