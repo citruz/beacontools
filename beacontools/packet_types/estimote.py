@@ -233,3 +233,58 @@ class EstimoteTelemetryFrameB(object):
     def __str__(self):
         return "EstimoteTelemetryFrameB<identifier: %s, protocol_version: %u>" \
             % (self.identifier, self.protocol_version)
+
+
+class EstimoteNearable(object):
+    """EstimoteNearable advertisement."""
+
+    def __init__(self, data):
+        """init"""
+        self._identifier = data_to_hexstring(data['identifier'])
+        self._hardware_version = data['hardware_version']
+        self._firmware_version = data['firmware_version']
+
+        # byte 13 and the first 4 bits of byte 14 is the temperature in signed,
+        temperature_raw_value = (data['temperature'] & 0x0fff)
+        if temperature_raw_value > 2047:
+            # convert a 12-bit unsigned integer to a signed one
+            temperature_raw_value = temperature_raw_value - 4096
+        temperature = temperature_raw_value / 16.0
+        self._temperature = temperature
+        self._is_moving = data['is_moving'] & 0b01000000 != 0
+        #   var isMoving = (data.readUInt8(15) & 0b01000000) != 0;
+
+    @property
+    def identifier(self):
+        """The Nearable identifier (8 bytes)."""
+        return self._identifier
+
+    @property
+    def hardware_version(self):
+        """The hardware version of the nearable."""
+        return self._hardware_version
+
+    @property
+    def firmware_version(self):
+        """The firmware version of the nearable."""
+        return self._firmware_version
+
+    @property
+    def temperature(self):
+        """The temperature reading taken by the nearable."""
+        return self._temperature
+
+    @property
+    def is_moving(self):
+        """Whether the beacon is in motion at the moment."""
+        return self._is_moving
+
+    @property
+    def properties(self):
+        """Get beacon properties."""
+        return {'identifier': self.identifier, 'temperature': self.temperature,
+                'is_moving': self._is_moving}
+
+    def __str__(self):
+        return "EstimoteNearable<identifier: %s>" \
+               % self.identifier
