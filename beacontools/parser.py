@@ -1,10 +1,10 @@
 """Beacon advertisement parser."""
 from construct import ConstructError
 
-from .structs import LTVFrame, IBeaconAdvertisingPacket
+from .structs import LTVFrame, IBeaconAdvertisingPacket, CJMonitorAdvertisingPacket
 from .packet_types import EddystoneUIDFrame, EddystoneURLFrame, EddystoneEncryptedTLMFrame, \
                           EddystoneTLMFrame, EddystoneEIDFrame, IBeaconAdvertisement, \
-                          EstimoteTelemetryFrameA, EstimoteTelemetryFrameB
+                          EstimoteTelemetryFrameA, EstimoteTelemetryFrameB, CJMonitorAdvertisement
 from .const import EDDYSTONE_TLM_UNENCRYPTED, EDDYSTONE_TLM_ENCRYPTED, SERVICE_DATA_TYPE, \
                    EDDYSTONE_UID_FRAME, EDDYSTONE_TLM_FRAME, EDDYSTONE_URL_FRAME, \
                    EDDYSTONE_EID_FRAME, EDDYSTONE_UUID, ESTIMOTE_UUID, ESTIMOTE_TELEMETRY_FRAME, \
@@ -16,6 +16,8 @@ def parse_packet(packet):
     frame = parse_ltv_packet(packet)
     if frame is None:
         frame = parse_ibeacon_packet(packet)
+    if frame is None:
+        frame = parse_cjmonitor_packet(packet)
     return frame
 
 def parse_ltv_packet(packet):
@@ -71,6 +73,16 @@ def parse_ibeacon_packet(packet):
     try:
         pkt = IBeaconAdvertisingPacket.parse(packet)
         return IBeaconAdvertisement(pkt)
+
+    except ConstructError:
+        return None
+
+
+def parse_cjmonitor_packet(packet):
+    """Parse an CJ Monitor  advertisement packet."""
+    try:
+        pkt = CJMonitorAdvertisingPacket.parse(packet)
+        return CJMonitorAdvertisement(pkt)
 
     except ConstructError:
         return None
