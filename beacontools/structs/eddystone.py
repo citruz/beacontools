@@ -7,7 +7,7 @@ from ..const import EDDYSTONE_UUID, EDDYSTONE_URL_SCHEMES, EDDYSTONE_TLM_UNENCRY
                     EDDYSTONE_TLM_ENCRYPTED, EDDYSTONE_UID_FRAME, EDDYSTONE_URL_FRAME, \
                     EDDYSTONE_TLM_FRAME, EDDYSTONE_EID_FRAME, FLAGS_DATA_TYPE, \
                     SERVICE_DATA_TYPE, SERVICE_UUIDS_DATA_TYPE, ESTIMOTE_UUID, \
-                    ESTIMOTE_TELEMETRY_FRAME
+                    ESTIMOTE_TELEMETRY_FRAME, ESTIMOTE_NEARABLE_BATTERY_SERVICE_UUID
 
 from .estimote import EstimoteTelemetryFrame
 
@@ -76,7 +76,9 @@ LTV = Struct(
     "type" / Byte,
     "value" / Switch(lambda ctx: ctx.type, {
         FLAGS_DATA_TYPE: Array(lambda ctx: ctx.length -1, Byte),
-        SERVICE_UUIDS_DATA_TYPE: OneOf(Bytes(2), [EDDYSTONE_UUID, ESTIMOTE_UUID]),
+        SERVICE_UUIDS_DATA_TYPE: OneOf(Bytes(2), [EDDYSTONE_UUID,
+                                                  ESTIMOTE_UUID,
+                                                  ESTIMOTE_NEARABLE_BATTERY_SERVICE_UUID]),
         SERVICE_DATA_TYPE: ServiceData
     }, default=Array(lambda ctx: ctx.length -1, Byte)),
 )

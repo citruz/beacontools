@@ -223,11 +223,12 @@ class TestParser(unittest.TestCase):
         self.assertIsNotNone(str(frame))
 
     def test_estimote_nearable(self):
-        nearable_packet = b"\x02\x01\x04\x03\x03\x0f\x18\x17\xff\x5d" \
-                          b"\x01\x01\x1e\xfe\x42\x7e\xb6\xf4\xbc\x2f" \
-                          b"\x04\x01\x68\xa1\xaa\xfe\x05\xc1\x45\x25" \
-                          b"\x53\xb5"
-        frame = parse_packet(nearable_packet)
+        nearable_packet = b"\x04\x3e\x2b\x02\x01\x03\x01\x06\x2e\x4a" \
+                          b"\xda\x0a\xfa\x1f\x02\x01\x04\x03\x03\x0f" \
+                          b"\x18\x17\xff\x5d\x01\x01\x1e\xfe\x42\x7e" \
+                          b"\xb6\xf4\xbc\x2f\x04\x01\x68\xa1\xaa\xfe" \
+                          b"\x05\xc1\x45\x25\x53\xb5"
+        frame = parse_packet(nearable_packet[14:-1])
         self.assertIsInstance(frame, EstimoteNearable)
         self.assertEqual("1efe427eb6f4bc2f", frame.identifier)
         self.assertEqual(22.5, frame.temperature)

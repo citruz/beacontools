@@ -6,9 +6,9 @@ from .packet_types import EddystoneUIDFrame, EddystoneURLFrame, EddystoneEncrypt
                           EddystoneTLMFrame, EddystoneEIDFrame, IBeaconAdvertisement, \
                           EstimoteTelemetryFrameA, EstimoteTelemetryFrameB, EstimoteNearable
 from .const import EDDYSTONE_TLM_UNENCRYPTED, EDDYSTONE_TLM_ENCRYPTED, SERVICE_DATA_TYPE, \
-                   EDDYSTONE_UID_FRAME, EDDYSTONE_TLM_FRAME, EDDYSTONE_URL_FRAME, \
-                   EDDYSTONE_EID_FRAME, EDDYSTONE_UUID, ESTIMOTE_UUID, ESTIMOTE_TELEMETRY_FRAME, \
-                   ESTIMOTE_TELEMETRY_SUBFRAME_A, ESTIMOTE_TELEMETRY_SUBFRAME_B
+    EDDYSTONE_UID_FRAME, EDDYSTONE_TLM_FRAME, EDDYSTONE_URL_FRAME, \
+    EDDYSTONE_EID_FRAME, EDDYSTONE_UUID, ESTIMOTE_UUID, ESTIMOTE_TELEMETRY_FRAME, \
+    ESTIMOTE_TELEMETRY_SUBFRAME_A, ESTIMOTE_TELEMETRY_SUBFRAME_B, MANUFACTURER_SPECIFIC_DATA
 
 
 def parse_packet(packet):
@@ -17,9 +17,6 @@ def parse_packet(packet):
 
     if frame is None:
         frame = parse_ibeacon_packet(packet)
-
-    if frame is None:
-        frame = parse_estimote_nearable_packet(packet[9:-1])
 
     return frame
 
@@ -36,14 +33,15 @@ def parse_ltv_packet(packet):
 
                 elif data["service_identifier"] == ESTIMOTE_UUID:
                     return parse_estimote_service_data(data)
-
+            if ltv['type'] == MANUFACTURER_SPECIFIC_DATA:
+                return parse_estimote_nearable_packet(bytearray(ltv['value']))
     except ConstructError:
         return None
 
     return None
 
 def parse_estimote_nearable_packet(packet):
-    """Parse an ibeacon beacon advertisement packet."""
+    """Parse estimote nearable advertisement packet."""
     try:
         pkt = EstimoteNearableFrame.parse(packet)
         return EstimoteNearable(pkt)
