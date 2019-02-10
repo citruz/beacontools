@@ -8,8 +8,7 @@ Currently supported types are:
 
 * `Eddystone Beacons <https://github.com/google/eddystone/>`__
 * `iBeacons <https://developer.apple.com/ibeacon/>`__ (Apple and Cypress CYALKIT-E02)
-* `Estimote Beacons (Telemetry only) <https://github.com/estimote/estimote-specs>`__
-* `Estimote Nearables <https://github.com/estimote/estimote-specs>`__
+* `Estimote Beacons (Telemetry and Nearable) <https://github.com/estimote/estimote-specs>`__
 
 The BeaconTools library has two main components:
 

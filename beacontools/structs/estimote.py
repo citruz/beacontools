@@ -2,7 +2,7 @@
 from construct import Struct, Byte, Switch, Int8sl, Array, Int8ul, Const, Int16ul
 
 from ..const import ESTIMOTE_TELEMETRY_SUBFRAME_A, ESTIMOTE_TELEMETRY_SUBFRAME_B, \
-    ESTIMOTE_NEARABLE_FRAME, ESTIMOTE_MANUFACTURER_BYTES
+                    ESTIMOTE_NEARABLE_FRAME
 
 # pylint: disable=invalid-name
 
@@ -30,7 +30,6 @@ EstimoteTelemetryFrame = Struct(
 )
 
 EstimoteNearableFrame = Struct(
-    Const(ESTIMOTE_MANUFACTURER_BYTES),
     Const(ESTIMOTE_NEARABLE_FRAME),
     "identifier" / Array(8, Byte),
     "hardware_version" / Int8ul,

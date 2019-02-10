@@ -1,12 +1,8 @@
 """All low level structures used for parsing eddystone packets."""
 from construct import Struct, Byte, Switch, OneOf, Int8sl, Array, \
-                      GreedyString, Int16ub, Int16ul, Int32ub, Bytes
-from ..const import EDDYSTONE_UUID, EDDYSTONE_URL_SCHEMES, EDDYSTONE_TLM_UNENCRYPTED, \
-                    EDDYSTONE_TLM_ENCRYPTED, EDDYSTONE_UID_FRAME, EDDYSTONE_URL_FRAME, \
-                    EDDYSTONE_TLM_FRAME, EDDYSTONE_EID_FRAME, ESTIMOTE_UUID, \
-                    ESTIMOTE_TELEMETRY_FRAME
+                      GreedyString, Int16ub, Int16ul, Int32ub
 
-from .estimote import EstimoteTelemetryFrame
+from ..const import EDDYSTONE_URL_SCHEMES, EDDYSTONE_TLM_UNENCRYPTED, EDDYSTONE_TLM_ENCRYPTED
 
 # pylint: disable=invalid-name
 
@@ -47,22 +43,4 @@ EddystoneTLMFrame = Struct(
 EddystoneEIDFrame = Struct(
     "tx_power" / Int8sl,
     "eid" / Array(8, Byte)
-)
-
-ServiceData = Struct(
-    "service_identifier" / OneOf(Bytes(2), [EDDYSTONE_UUID, ESTIMOTE_UUID]),
-    "frame_type" / Byte,
-    "frame" / Switch(lambda ctx: ctx.service_identifier, {
-        # eddystone frames
-        EDDYSTONE_UUID: Switch(lambda ctx: ctx.frame_type, {
-            EDDYSTONE_UID_FRAME: EddystoneUIDFrame,
-            EDDYSTONE_URL_FRAME: EddystoneURLFrame,
-            EDDYSTONE_TLM_FRAME: EddystoneTLMFrame,
-            EDDYSTONE_EID_FRAME: EddystoneEIDFrame,
-        }),
-        # estimote frames
-        ESTIMOTE_UUID: Switch(lambda ctx: ctx.frame_type & 0xF, {
-            ESTIMOTE_TELEMETRY_FRAME: EstimoteTelemetryFrame,
-        }),
-    }),
 )

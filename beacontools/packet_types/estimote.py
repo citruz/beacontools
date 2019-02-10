@@ -236,10 +236,9 @@ class EstimoteTelemetryFrameB(object):
 
 
 class EstimoteNearable(object):
-    """EstimoteNearable advertisement."""
+    """Estimote Nearable advertisement."""
 
     def __init__(self, data):
-        """init"""
         self._identifier = data_to_hexstring(data['identifier'])
         self._hardware_version = data['hardware_version']
         self._firmware_version = data['firmware_version']
@@ -252,7 +251,6 @@ class EstimoteNearable(object):
         temperature = temperature_raw_value / 16.0
         self._temperature = temperature
         self._is_moving = data['is_moving'] & 0b01000000 != 0
-        #   var isMoving = (data.readUInt8(15) & 0b01000000) != 0;
 
     @property
     def identifier(self):

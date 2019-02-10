@@ -332,3 +332,7 @@ class TestScanner(unittest.TestCase):
               b"\x00\x00\x01\x00\x00\xdd"
         scanner._mon.process_packet(pkt)
         self.assertEqual(callback.call_count, 3)
+
+
+if __name__ == "__main__":
+    unittest.main()
