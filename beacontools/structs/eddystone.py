@@ -1,7 +1,6 @@
 """All low level structures used for parsing eddystone packets."""
 from construct import Struct, Byte, Switch, OneOf, Int8sl, Array, \
-                      Int16ul, Int16ub, Int32ub, GreedyString, Bytes
-
+                      GreedyString, Int16ub, Int16ul, Int32ub, Bytes
 from ..const import EDDYSTONE_UUID, EDDYSTONE_URL_SCHEMES, EDDYSTONE_TLM_UNENCRYPTED, \
                     EDDYSTONE_TLM_ENCRYPTED, EDDYSTONE_UID_FRAME, EDDYSTONE_URL_FRAME, \
                     EDDYSTONE_TLM_FRAME, EDDYSTONE_EID_FRAME, ESTIMOTE_UUID, \
