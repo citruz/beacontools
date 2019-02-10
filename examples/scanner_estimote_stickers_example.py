@@ -10,3 +10,4 @@ scanner = BeaconScanner(callback,
                         )
 scanner.start()
 time.sleep(10)
+scanner.stop()
