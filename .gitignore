@@ -1,6 +1,7 @@
 # general things to ignore
 build/
 dist/
+.idea
 *.egg-info/
 *.egg
 *.py[cod]
@@ -15,5 +16,3 @@ venv27/
 .coverage
 .tox
 .cache
-
-.idea/*
