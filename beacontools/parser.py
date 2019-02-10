@@ -1,7 +1,7 @@
 """Beacon advertisement parser."""
 from construct import ConstructError
 
-from .structs import IBeaconAdvertisingPacket, LTVFrame
+from .structs import LTVFrame
 from .packet_types import EddystoneUIDFrame, EddystoneURLFrame, EddystoneEncryptedTLMFrame, \
                           EddystoneTLMFrame, EddystoneEIDFrame, IBeaconAdvertisement, \
                           EstimoteTelemetryFrameA, EstimoteTelemetryFrameB, EstimoteNearable, \
@@ -10,18 +10,14 @@ from .const import EDDYSTONE_TLM_UNENCRYPTED, EDDYSTONE_TLM_ENCRYPTED, SERVICE_D
                    EDDYSTONE_UID_FRAME, EDDYSTONE_TLM_FRAME, EDDYSTONE_URL_FRAME, \
                    EDDYSTONE_EID_FRAME, EDDYSTONE_UUID, ESTIMOTE_UUID, ESTIMOTE_TELEMETRY_FRAME, \
                    ESTIMOTE_TELEMETRY_SUBFRAME_A, ESTIMOTE_TELEMETRY_SUBFRAME_B, \
-                   MANUFACTURER_SPECIFIC_DATA_TYPE, ESTIMOTE_MANUFACTURER_ID, CJ_MANUFACTURER_ID
+                   MANUFACTURER_SPECIFIC_DATA_TYPE, ESTIMOTE_MANUFACTURER_ID, CJ_MANUFACTURER_ID, \
+                   IBEACON_MANUFACTURER_ID
 
 # pylint: disable=invalid-name
 
 def parse_packet(packet):
     """Parse a beacon advertisement packet."""
-    frame = parse_ltv_packet(packet)
-
-    if frame is None:
-        frame = parse_ibeacon_packet(packet)
-
-    return frame
+    return parse_ltv_packet(packet)
 
 def parse_ltv_packet(packet):
     """Parse a tag-length-value style beacon packet."""
@@ -46,6 +42,9 @@ def parse_ltv_packet(packet):
 
                 elif data["company_identifier"] == CJ_MANUFACTURER_ID:
                     return CJMonitorAdvertisement(frame)
+
+                elif data["company_identifier"] == IBEACON_MANUFACTURER_ID:
+                    return IBeaconAdvertisement(data['data'])
 
     except ConstructError:
         return None
@@ -80,12 +79,3 @@ def parse_estimote_service_data(data):
         elif data['frame']['subframe_type'] == ESTIMOTE_TELEMETRY_SUBFRAME_B:
             return EstimoteTelemetryFrameB(data['frame'], protocol_version)
     return None
-
-def parse_ibeacon_packet(packet):
-    """Parse an ibeacon beacon advertisement packet."""
-    try:
-        pkt = IBeaconAdvertisingPacket.parse(packet)
-        return IBeaconAdvertisement(pkt)
-
-    except ConstructError:
-        return None

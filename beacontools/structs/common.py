@@ -2,13 +2,14 @@
 from construct import Struct, Byte, Switch, OneOf, Array, Bytes, GreedyRange, BitStruct, \
                       BitsInteger, Flag
 
+from .ibeacon import IBeaconMSD
 from .eddystone import EddystoneUIDFrame, EddystoneURLFrame, EddystoneTLMFrame, EddystoneEIDFrame
 from .estimote import EstimoteTelemetryFrame, EstimoteNearableFrame
 from .controlj import CJMonitorMSD
 from ..const import SERVICE_DATA_TYPE, MANUFACTURER_SPECIFIC_DATA_TYPE, EDDYSTONE_UUID, \
                     ESTIMOTE_UUID, EDDYSTONE_UID_FRAME, EDDYSTONE_URL_FRAME, EDDYSTONE_TLM_FRAME, \
                     EDDYSTONE_EID_FRAME, ESTIMOTE_TELEMETRY_FRAME, ESTIMOTE_MANUFACTURER_ID, \
-                    CJ_MANUFACTURER_ID, FLAGS_DATA_TYPE
+                    CJ_MANUFACTURER_ID, FLAGS_DATA_TYPE, IBEACON_MANUFACTURER_ID
 
 # pylint: disable=invalid-name
 
@@ -44,6 +45,7 @@ ManufacturerSpecificData = Struct(
     "data" / Switch(lambda ctx: ctx.company_identifier, {
         ESTIMOTE_MANUFACTURER_ID: EstimoteNearableFrame,
         CJ_MANUFACTURER_ID: CJMonitorMSD,
+        IBEACON_MANUFACTURER_ID: IBeaconMSD,
     })
 )
 
