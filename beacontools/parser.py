@@ -13,7 +13,7 @@ from .const import EDDYSTONE_TLM_UNENCRYPTED, EDDYSTONE_TLM_ENCRYPTED, SERVICE_D
                    MANUFACTURER_SPECIFIC_DATA_TYPE, ESTIMOTE_MANUFACTURER_ID, CJ_MANUFACTURER_ID, \
                    IBEACON_MANUFACTURER_ID
 
-# pylint: disable=invalid-name
+# pylint: disable=invalid-name,too-many-return-statements
 
 def parse_packet(packet):
     """Parse a beacon advertisement packet."""
