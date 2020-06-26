@@ -24,7 +24,11 @@ If you only want to use the **parser** install the library using pip and you're 
 
     pip install beacontools
     
-If you want to perfom beacon **scanning** there are a few more requirement. First of all you need an OS with bluez (most Linux OS; Windows and macOS are also possible but untested, see the "`Build Requirements <https://github.com/karulis/pybluez>`__" section of pybluez for more information).
+If you want to perfom beacon **scanning** there are a few more requirements.
+First of all, you need a supported OS: currently that's Linux with BlueZ, and FreeBSD.
+Second, you need raw socket access (via Linux capabilities, or by running as root).
+
+A typical Linux installation would look like this:
 
 .. code:: bash
 
