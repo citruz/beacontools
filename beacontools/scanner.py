@@ -136,7 +136,7 @@ class Monitor(threading.Thread):
         interval_fractions, window_fractions = int(interval_fractions), int(window_fractions)
 
         scan_parameter_pkg = struct.pack(
-            ">BHHBB",
+            "<BHHBB",
             scan_type,
             interval_fractions,
             window_fractions,
@@ -152,7 +152,7 @@ class Monitor(threading.Thread):
             enable: boolean value to enable (True) or disable (False) scanner
             filter_duplicates: boolean value to enable/disable filter, that
                 omits duplicated packets"""
-        command = struct.pack(">BB", enable, filter_duplicates)
+        command = struct.pack("BB", enable, filter_duplicates)
         self.backend.send_cmd(self.socket, OGF_LE_CTL, OCF_LE_SET_SCAN_ENABLE, command)
 
     def process_packet(self, pkt):
