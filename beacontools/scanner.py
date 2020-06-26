@@ -67,7 +67,7 @@ class Monitor(threading.Thread):
     def __init__(self, callback, bt_device_id, device_filter, packet_filter):
         """Construct interface object."""
         # do import here so that the package can be used in parsing-only mode (no bluez required)
-        self.bluez = import_module('bluetooth._bluetooth')
+        self.backend = import_module('beacontools.backend')
 
         threading.Thread.__init__(self)
         self.daemon = False
@@ -88,12 +88,7 @@ class Monitor(threading.Thread):
 
     def run(self):
         """Continously scan for BLE advertisements."""
-        self.socket = self.bluez.hci_open_dev(self.bt_device_id)
-
-        filtr = self.bluez.hci_filter_new()
-        self.bluez.hci_filter_all_events(filtr)
-        self.bluez.hci_filter_set_ptype(filtr, self.bluez.HCI_EVENT_PKT)
-        self.socket.setsockopt(self.bluez.SOL_HCI, self.bluez.HCI_FILTER, filtr)
+        self.socket = self.backend.open_dev(self.bt_device_id)
 
         self.set_scan_parameters()
         self.toggle_scan(True)
@@ -147,8 +142,8 @@ class Monitor(threading.Thread):
             window_fractions,
             address_type,
             filter_type)
-        self.bluez.hci_send_cmd(self.socket, OGF_LE_CTL, OCF_LE_SET_SCAN_PARAMETERS,
-                                scan_parameter_pkg)
+        self.backend.send_cmd(self.socket, OGF_LE_CTL, OCF_LE_SET_SCAN_PARAMETERS,
+            scan_parameter_pkg)
 
     def toggle_scan(self, enable, filter_duplicates=False):
         """Enables or disables BLE scanning
@@ -158,7 +153,7 @@ class Monitor(threading.Thread):
             filter_duplicates: boolean value to enable/disable filter, that
                 omits duplicated packets"""
         command = struct.pack(">BB", enable, filter_duplicates)
-        self.bluez.hci_send_cmd(self.socket, OGF_LE_CTL, OCF_LE_SET_SCAN_ENABLE, command)
+        self.backend.send_cmd(self.socket, OGF_LE_CTL, OCF_LE_SET_SCAN_ENABLE, command)
 
     def process_packet(self, pkt):
         """Parse the packet and call callback if one of the filters matches."""
