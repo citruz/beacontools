@@ -14,7 +14,7 @@ from .utils import is_packet_type, is_one_of, to_int, bin_to_int, get_mode
 from .const import (ScannerMode, ScanType, ScanFilter, BluetoothAddressType,
                     LE_META_EVENT, OGF_LE_CTL, OCF_LE_SET_SCAN_ENABLE,
                     OCF_LE_SET_SCAN_PARAMETERS, EVT_LE_ADVERTISING_REPORT,
-                    MS_FRACTION_DIVIDER,)
+                    MS_FRACTION_DIVIDER, EXPOSURE_NOTIFICATION_UUID)
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -170,6 +170,7 @@ class Monitor(threading.Thread):
             ((self.mode & ScannerMode.MODE_EDDYSTONE) and (pkt[19:21] == b"\xaa\xfe")) or \
             ((self.mode & ScannerMode.MODE_ESTIMOTE) and (pkt[23:25] == b"\x5d\x01")) or \
             ((self.mode & ScannerMode.MODE_CJMONITOR) and (pkt[27:29] == b"\xfe\x10")) or \
+            ((self.mode & ScannerMode.MODE_EXPOSURE_NOTIFICATION) and (pkt[19:21] == EXPOSURE_NOTIFICATION_UUID)) or \
             ((self.mode & ScannerMode.MODE_ESTIMOTE) and (pkt[19:21] == b"\x9a\xfe"))):
             return
 

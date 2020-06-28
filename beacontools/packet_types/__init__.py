@@ -4,3 +4,4 @@ from .eddystone import EddystoneUIDFrame, EddystoneURLFrame, EddystoneEncryptedT
 from .ibeacon import IBeaconAdvertisement
 from .estimote import EstimoteTelemetryFrameA, EstimoteTelemetryFrameB, EstimoteNearable
 from .controlj import CJMonitorAdvertisement
+from .exposure_notification import ExposureNotificationFrame
