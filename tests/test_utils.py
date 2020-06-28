@@ -78,3 +78,7 @@ class TestUtils(unittest.TestCase):
         ]
         for string, expected in tests:
             self.assertEqual(bin_to_int(string), expected)
+
+
+if __name__ == "__main__":
+    unittest.main()

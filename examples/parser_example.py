@@ -2,6 +2,7 @@
 from beacontools import parse_packet
 
 # Eddystone UID packet
+
 uid_packet = b"\x02\x01\x06\x03\x03\xaa\xfe\x17\x16\xaa\xfe\x00\xe3\x12\x34\x56\x78\x90\x12" \
              b"\x34\x67\x89\x01\x00\x00\x00\x00\x00\x01\x00\x00"
 uid_frame = parse_packet(uid_packet)
@@ -85,3 +86,27 @@ print("Protocol Version: %d" % telemetry_b.protocol_version)
 print("Magnetic field: (%f, %f, %f)" % telemetry_b.magnetic_field)
 print("Temperature: %f °C" % telemetry_b.temperature)
 # ... see packet_types/estimote.py for all available attributes and units
+
+# Estimote Nearable Advertisement
+nearable_packet = b"\x02\x01\x04\x03\x03\x0f\x18\x17\xff\x5d" \
+                  b"\x01\x01\x1e\xfe\x42\x7e\xb6\xf4\xbc\x2f" \
+                  b"\x04\x01\x68\xa1\xaa\xfe\x05\xc1\x45\x25" \
+                  b"\x53\xb5"
+nearable_adv = parse_packet(nearable_packet)
+print("Identifier: %s" % nearable_adv.identifier)
+print("Hardware_version: %d" % nearable_adv.hardware_version)
+print("Firmware_version: %d" % nearable_adv.firmware_version)
+print("Temperature: %d" % nearable_adv.temperature)
+print("Is moving: %i" % nearable_adv.is_moving)
+
+print("-----")
+
+# CJ Monitor packet
+cj_monitor_packet = b"\x02\x01\x06\x05\x02\x1A\x18\x00\x18" \
+                    b"\x09\xFF\x72\x04\xFE\x10\xD1\x0C\x33\x61" \
+                    b"\x09\x09\x4D\x6F\x6E\x20\x35\x36\x34\x33"
+cj_monitor = parse_packet(cj_monitor_packet)
+print("Name: %s" % cj_monitor.name)
+print("Temperature: %f °C" % cj_monitor.temperature)
+print("Humidity: %d %%" % cj_monitor.humidity)
+print("Light: %f" % cj_monitor.light)

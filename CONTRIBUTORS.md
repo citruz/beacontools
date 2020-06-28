@@ -5,3 +5,5 @@ Many thanks to everyone who contributed to this project:
 - marcosmoreno (https://github.com/marcosmoreno)
 - darkskiez (https://github.com/darkskiez) Google LLC
 - cereal (https://github.com/cereal)
+- shaun (https://github.com/ShaunPlummer)
+- clydebarrow (https://github.com/clydebarrow)

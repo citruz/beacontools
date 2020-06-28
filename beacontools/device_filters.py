@@ -1,5 +1,5 @@
 """Filters passed to the BeaconScanner to filter results."""
-
+from .const import CJ_MANUFACTURER_ID, CJ_TEMPHUM_TYPE
 from .utils import is_valid_mac
 
 
@@ -29,6 +29,19 @@ class DeviceFilter(object):
             self.__class__.__name__,
             ", ".join(["=".join((k, str(v),)) for k, v in self.properties.items()]))
 
+
+class CJMonitorFilter(DeviceFilter):
+    """Filter for CJ Monitor."""
+
+    def __init__(self, company_id=CJ_MANUFACTURER_ID, beacon_type=CJ_TEMPHUM_TYPE):
+        """Initialize filter."""
+        super(CJMonitorFilter, self).__init__()
+        if company_id is None and beacon_type is None:
+            raise ValueError("CJMonitorFilter needs at least one argument set")
+        if company_id is not None:
+            self.properties['company_id'] = company_id
+        if beacon_type is not None:
+            self.properties['beacon_type'] = beacon_type
 
 class IBeaconFilter(DeviceFilter):
     """Filter for iBeacon."""

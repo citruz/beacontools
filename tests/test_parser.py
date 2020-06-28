@@ -4,6 +4,7 @@ import unittest
 from beacontools import parse_packet, EddystoneUIDFrame, EddystoneURLFrame, \
                         EddystoneEncryptedTLMFrame, EddystoneTLMFrame, EddystoneEIDFrame, \
                         IBeaconAdvertisement, EstimoteTelemetryFrameA, EstimoteTelemetryFrameB
+from beacontools.packet_types import EstimoteNearable
 
 class TestParser(unittest.TestCase):
     """Test the parser."""
@@ -14,7 +15,6 @@ class TestParser(unittest.TestCase):
             b"0000000",
             b"",
             b"\x02\x01\x06\x03\x03",
-            b"\x02\x01\x06\x03\x03\xab\xfe\x17\x16\xaa\xfe\x00\xe3\x12\x34\x56\x78\x90" \
             b"\x12\x34\x67\x89\x01\x00\x00\x00\x00\x00\x01\x00\x00",
             b"\x02\x01\x06\x03\x03\xaa\xfe\x17\x16\xaa\xfe\x01\xe3\x12\x34\x56\x78\x90" \
             b"\x12\x34\x67\x89\x01\x00\x00\x00\x00\x00\x01\x00\x00"
@@ -220,3 +220,20 @@ class TestParser(unittest.TestCase):
         self.assertEqual(frame.has_clock_error, True)
         self.assertEqual(frame.battery_level, None)
         self.assertIsNotNone(str(frame))
+
+    def test_estimote_nearable(self):
+        nearable_packet = b"\x02\x01\x04\x03\x03\x0f" \
+                          b"\x18\x17\xff\x5d\x01\x01\x1e\xfe\x42\x7e" \
+                          b"\xb6\xf4\xbc\x2f\x04\x01\x68\xa1\xaa\xfe" \
+                          b"\x05\xc1\x45\x25\x53"
+        frame = parse_packet(nearable_packet)
+        self.assertIsInstance(frame, EstimoteNearable)
+        self.assertEqual("1efe427eb6f4bc2f", frame.identifier)
+        self.assertEqual(22.5, frame.temperature)
+        self.assertEqual(1, frame.firmware_version)
+        self.assertEqual(4, frame.hardware_version)
+        self.assertFalse(frame.is_moving)
+
+
+if __name__ == "__main__":
+    unittest.main()
