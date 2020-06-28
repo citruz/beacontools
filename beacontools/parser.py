@@ -29,10 +29,10 @@ def parse_ltv_packet(packet):
                 data = ltv['value']
 
                 if data["service_identifier"] == EDDYSTONE_UUID:
-                    return parse_eddystone_service_data(data)
+                    return parse_eddystone_service_data(data['service_data'])
 
                 elif data["service_identifier"] == ESTIMOTE_UUID:
-                    return parse_estimote_service_data(data)
+                    return parse_estimote_service_data(data['service_data'])
 
                 elif data["service_identifier"] == EXPOSURE_NOTIFICATION_UUID:
                     return ExposureNotificationFrame(data["service_data"])

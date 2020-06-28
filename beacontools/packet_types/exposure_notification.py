@@ -1,6 +1,4 @@
 """Packet classes for Eddystone beacons."""
-from binascii import hexlify
-from ..const import EDDYSTONE_URL_SCHEMES, EDDYSTONE_TLD_ENCODINGS
 from ..utils import data_to_hexstring, data_to_binstring
 
 class ExposureNotificationFrame(object):
@@ -8,7 +6,7 @@ class ExposureNotificationFrame(object):
 
     def __init__(self, data):
         self._identifier = data_to_hexstring(data['identifier'])
-        self._metadata = data['metadata']
+        self._encrypted_metadata = data_to_binstring(data['encrypted_metadata'])
 
     @property
     def identifier(self):
@@ -16,11 +14,14 @@ class ExposureNotificationFrame(object):
         return self._identifier
 
     @property
+    def encrypted_metadata(self):
+        """4 byte encrypted data containing version info and transmission power"""
+        return self._encrypted_metadata
+
+    @property
     def properties(self):
         """Get beacon properties."""
-        return {'identifier': self.identifier}
+        return {'identifier': self.identifier, 'encrypted_metadata' : self.encrypted_metadata}
 
     def __str__(self):
-        return "ExposureNotificationFrame<identifier: %s>" \
-               % (self.identifier)
-
+        return "ExposureNotificationFrame<identifier: %s>" % (self.identifier)

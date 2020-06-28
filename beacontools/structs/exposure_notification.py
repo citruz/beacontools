@@ -7,5 +7,5 @@ from construct import Array, Byte, Struct
 
 ExposureNotificationFrame = Struct(
     "identifier" / Array(16, Byte),
-    "metadata" / Array(4, Byte),
+    "encrypted_metadata" / Array(4, Byte),
 )
