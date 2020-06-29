@@ -125,7 +125,8 @@ Changelog
 ---------
 Beacontools follows the `semantic versioning <https://semver.org/>`__ scheme.
 
-* 1.4.0
+* 2.0.0
+    * Dropped support for Python 2.7 and 3.4
     * Added support for COVID-19 Exposure Notifications
     * Added support for FreeBSD and fixed temperature parsing (thanks to `myfreeweb <https://github.com/myfreeweb>`__)
     * Added support for Control-J Monitor beacons (thanks to `clydebarrow <https://github.com/clydebarrow>`__)

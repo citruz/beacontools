@@ -13,7 +13,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 setup(
     name='beacontools',
 
-    version='1.3.1',
+    version='2.0.0',
 
     description='A Python library for working with various types of Bluetooth LE Beacons.',
     long_description=long_description,
@@ -33,10 +33,7 @@ setup(
 
         'License :: OSI Approved :: MIT License',
 
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
@@ -55,9 +52,7 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
-        'enum34;python_version<"3.4"',
-        # construct 2.10 removed python2 support so we will stay on 2.9 for now
-        'construct==2.8.16,<2.10'
+        'construct>=2.9.52,<2.11'
     ],
 
     # List additional groups of dependencies here (e.g. development

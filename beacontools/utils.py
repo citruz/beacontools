@@ -29,7 +29,7 @@ def data_to_uuid(data):
 
 def data_to_binstring(data):
     """Convert an array of binary data to a binary string."""
-    return array.array('B', data).tostring()
+    return array.array('B', data).tobytes()
 
 def mulaw_to_value(mudata):
     """Convert a mu-law encoded value to linear."""
@@ -40,7 +40,7 @@ def bt_addr_to_string(addr):
     """Convert a binary string to the hex representation."""
     addr_str = array.array('B', addr)
     addr_str.reverse()
-    hex_str = hexlify(addr_str.tostring()).decode('ascii')
+    hex_str = hexlify(addr_str.tobytes()).decode('ascii')
     # insert ":" seperator between the bytes
     return ':'.join(a+b for a, b in zip(hex_str[::2], hex_str[1::2]))
 
