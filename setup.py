@@ -3,6 +3,7 @@
 from setuptools import setup, find_packages
 from codecs import open
 from os import path
+import sys
 
 here = path.abspath(path.dirname(__file__))
 
@@ -64,7 +65,7 @@ setup(
     # for example:
     # $ pip install -e .[dev,test]
     extras_require={
-        'scan': ['PyBluez==0.22'],
+        'scan': ['PyBluez==0.22'] if sys.platform.startswith("linux") else [],
         'dev': ['check-manifest'],
         'test': [
             'coveralls==1.5.1',

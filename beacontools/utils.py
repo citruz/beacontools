@@ -55,11 +55,13 @@ def is_one_of(obj, types):
 
 def is_packet_type(cls):
     """Check if class is one the packet types."""
+    # pylint: disable=import-outside-toplevel
     from .packet_types import EddystoneUIDFrame, EddystoneURLFrame, \
                               EddystoneEncryptedTLMFrame, EddystoneTLMFrame, \
                               EddystoneEIDFrame, IBeaconAdvertisement, \
                               EstimoteTelemetryFrameA, EstimoteTelemetryFrameB, \
                               ExposureNotificationFrame
+    # pylint: enable=import-outside-toplevel
 
     return (cls in [EddystoneURLFrame, EddystoneUIDFrame, EddystoneEncryptedTLMFrame, \
                     EddystoneTLMFrame, EddystoneEIDFrame, IBeaconAdvertisement, \
@@ -86,7 +88,8 @@ def bin_to_int(string):
 def get_mode(device_filter):
     """Determine which beacons the scanner should look for."""
     from .device_filters import IBeaconFilter, EddystoneFilter, BtAddrFilter, EstimoteFilter, \
-                                CJMonitorFilter, ExposureNotificationFilter
+                                CJMonitorFilter, ExposureNotificationFilter  # pylint: disable=import-outside-toplevel
+
     if device_filter is None or len(device_filter) == 0:
         return ScannerMode.MODE_ALL
 
