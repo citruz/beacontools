@@ -107,10 +107,29 @@ Scanner
     scanner.stop()
 
 
+Customizing Scanning Parameters
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Some Bluetooth dongle don't allow scanning in Randomized MAC mode. If you don't receive any scan results, try setting the scan mode to PUBLIC:
+
+.. code:: python
+    from beacontools import BeaconScanner, BluetoothAddressType
+
+    scanner = BeaconScanner(
+        callback,
+        scan_parameters={"address_type": BluetoothAddressType.PUBLIC}
+    )
+
+For all available options see ``Monitor.set_scan_parameters``.
+
 Changelog
 ---------
 Beacontools follows the `semantic versioning <https://semver.org/>`__ scheme.
 
+* 1.4.0
+    * Added support for COVID-19 Exposure Notifications
+    * Added support for FreeBSD and fixed temperature parsing (thanks to `myfreeweb <https://github.com/myfreeweb>`__)
+    * Added support for Control-J Monitor beacons (thanks to `clydebarrow <https://github.com/clydebarrow>`__)
+    * Added support for Estimote Nearables (thanks to `ShaunPlummer <https://github.com/ShaunPlummer>`__)
 * 1.3.1
     * Multiple fixes and internal refactorings, including support for Raspberry Pi 3B+ (huge thanks to `cereal <https://github.com/cereal>`__)
     * Updated dependencies

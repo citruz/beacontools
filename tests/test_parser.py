@@ -71,7 +71,7 @@ class TestParser(unittest.TestCase):
         frame = parse_packet(tlm_packet)
         self.assertIsInstance(frame, EddystoneTLMFrame)
         self.assertEqual(frame.voltage, 2840)
-        self.assertTrue(abs(frame.temperature_fixed_point - 17.27) < 0.1)
+        self.assertTrue(abs(frame.temperature - 17.27) < 0.1)
         self.assertEqual(frame.advertising_count, 5223)
         self.assertEqual(frame.seconds_since_boot, 10948)
         self.assertIsNotNone(str(frame))

@@ -1,5 +1,5 @@
 """A library for working with various types of Bluetooth LE Beacons.."""
-from .const import CYPRESS_BEACON_DEFAULT_UUID
+from .const import CYPRESS_BEACON_DEFAULT_UUID, BluetoothAddressType, ScanFilter, ScanType
 from .scanner import BeaconScanner
 from .parser import parse_packet
 from .packet_types.eddystone import EddystoneUIDFrame, EddystoneURLFrame, \
