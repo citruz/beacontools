@@ -2,7 +2,7 @@
 import sys
 
 if sys.platform.startswith("linux"):
-    from .bluez import *
+    from .linux import *
 elif sys.platform.startswith("freebsd"):
     from .freebsd import *
 else:
