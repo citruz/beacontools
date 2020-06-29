@@ -112,6 +112,7 @@ Customizing Scanning Parameters
 Some Bluetooth dongle don't allow scanning in Randomized MAC mode. If you don't receive any scan results, try setting the scan mode to PUBLIC:
 
 .. code:: python
+
     from beacontools import BeaconScanner, BluetoothAddressType
 
     scanner = BeaconScanner(

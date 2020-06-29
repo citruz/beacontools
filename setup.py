@@ -66,7 +66,7 @@ setup(
             'coveralls==1.5.1',
             'pytest==5.4.3',
             'pytest-cov==2.10.0',
-            'mock==4.0.2',
+            'mock==3.0.5',
             'check-manifest==0.42',
             'pylint',
             'readme_renderer',

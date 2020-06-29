@@ -27,6 +27,7 @@ class HciRawFilter(ctypes.Structure):
 
 def open_dev(bt_device_id):
     """Open hci device socket."""
+    # pylint: disable=no-member
     sock = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_RAW, socket.BTPROTO_HCI)
 
     # Unlike Linux, FreeBSD has separate numbering depending on hardware
@@ -40,6 +41,7 @@ def open_dev(bt_device_id):
         raise ConnectionError(ctypes.get_errno(), os.strerror(ctypes.get_errno()))
     if libc.connect(sock.fileno(), ctypes.pointer(adr), ctypes.sizeof(SockaddrHci)) != 0:
         raise ConnectionError(ctypes.get_errno(), os.strerror(ctypes.get_errno()))
+    # pylint: enable=no-member
 
     fltr = HciRawFilter(0, NG_HCI_EVENT_MASK_LE)
     if libc.setsockopt(sock.fileno(),
