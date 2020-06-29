@@ -56,7 +56,8 @@ setup(
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
         'enum34;python_version<"3.4"',
-        'construct>=2.8.16,<2.10'
+        # construct 2.10 removed python2 support so we will stay on 2.9 for now
+        'construct==2.8.16,<2.10'
     ],
 
     # List additional groups of dependencies here (e.g. development
@@ -68,10 +69,10 @@ setup(
         'dev': ['check-manifest'],
         'test': [
             'coveralls==1.5.1',
-            'pytest==4.0.2',
-            'pytest-cov==2.6.0',
-            'mock==2.0.0',
-            'check-manifest==0.37',
+            'pytest==5.4.3',
+            'pytest-cov==2.10.0',
+            'mock==4.0.2',
+            'check-manifest==0.42',
             'pylint',
             'readme_renderer',
             'docutils'

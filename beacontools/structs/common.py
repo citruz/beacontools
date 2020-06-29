@@ -6,10 +6,12 @@ from .ibeacon import IBeaconMSD
 from .eddystone import EddystoneUIDFrame, EddystoneURLFrame, EddystoneTLMFrame, EddystoneEIDFrame
 from .estimote import EstimoteTelemetryFrame, EstimoteNearableFrame
 from .controlj import CJMonitorMSD
+from .exposure_notification import ExposureNotificationFrame
 from ..const import SERVICE_DATA_TYPE, MANUFACTURER_SPECIFIC_DATA_TYPE, EDDYSTONE_UUID, \
                     ESTIMOTE_UUID, EDDYSTONE_UID_FRAME, EDDYSTONE_URL_FRAME, EDDYSTONE_TLM_FRAME, \
                     EDDYSTONE_EID_FRAME, ESTIMOTE_TELEMETRY_FRAME, ESTIMOTE_MANUFACTURER_ID, \
-                    CJ_MANUFACTURER_ID, FLAGS_DATA_TYPE, IBEACON_MANUFACTURER_ID
+                    CJ_MANUFACTURER_ID, FLAGS_DATA_TYPE, IBEACON_MANUFACTURER_ID, \
+                    EXPOSURE_NOTIFICATION_UUID
 
 # pylint: disable=invalid-name
 
@@ -23,21 +25,29 @@ AdvertisingFlags = BitStruct(
 )
 
 ServiceData = Struct(
-    "service_identifier" / OneOf(Bytes(2), [EDDYSTONE_UUID, ESTIMOTE_UUID]),
-    "frame_type" / Byte,
-    "frame" / Switch(lambda ctx: ctx.service_identifier, {
-        # eddystone frames
-        EDDYSTONE_UUID: Switch(lambda ctx: ctx.frame_type, {
-            EDDYSTONE_UID_FRAME: EddystoneUIDFrame,
-            EDDYSTONE_URL_FRAME: EddystoneURLFrame,
-            EDDYSTONE_TLM_FRAME: EddystoneTLMFrame,
-            EDDYSTONE_EID_FRAME: EddystoneEIDFrame,
-        }),
-        # estimote frames
-        ESTIMOTE_UUID: Switch(lambda ctx: ctx.frame_type & 0xF, {
-            ESTIMOTE_TELEMETRY_FRAME: EstimoteTelemetryFrame,
-        }),
-    }),
+    "service_identifier" / OneOf(Bytes(2), [
+        EDDYSTONE_UUID,
+        ESTIMOTE_UUID,
+        EXPOSURE_NOTIFICATION_UUID
+    ]),
+    "service_data" / Switch(lambda ctx: ctx.service_identifier, {
+        EXPOSURE_NOTIFICATION_UUID: ExposureNotificationFrame,
+        EDDYSTONE_UUID: Struct(
+            "frame_type" / Byte,
+            "frame" / Switch(lambda ctx: ctx.frame_type, {
+                EDDYSTONE_UID_FRAME: EddystoneUIDFrame,
+                EDDYSTONE_URL_FRAME: EddystoneURLFrame,
+                EDDYSTONE_TLM_FRAME: EddystoneTLMFrame,
+                EDDYSTONE_EID_FRAME: EddystoneEIDFrame,
+            })
+        ),
+        ESTIMOTE_UUID:  Struct(
+            "frame_type" / Byte,
+            "frame" / Switch(lambda ctx: ctx.frame_type & 0xF, {
+                ESTIMOTE_TELEMETRY_FRAME: EstimoteTelemetryFrame,
+            })
+        ),
+    })
 )
 
 ManufacturerSpecificData = Struct(

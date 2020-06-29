@@ -87,6 +87,17 @@ class EstimoteFilter(DeviceFilter):
             self.properties['protocol_version'] = protocol_version
 
 
+class ExposureNotificationFilter(DeviceFilter):
+    """Filter for specific exposure notification identifier."""
+
+    def __init__(self, identifier):
+        """Initialize filter."""
+        super(ExposureNotificationFilter, self).__init__()
+        if identifier is None:
+            raise ValueError("ExposureNotificationFilter needs identifier to be set")
+        self.properties['identifier'] = identifier
+
+
 class BtAddrFilter(DeviceFilter):
     """Filter by bluetooth address."""
 

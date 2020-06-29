@@ -1,5 +1,5 @@
 sudo: required
-dist: xenial
+dist: bionic
 
 matrix:
   fast_finish: true
