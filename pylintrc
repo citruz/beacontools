@@ -3,4 +3,4 @@ reports=no
 
 disable=cyclic-import,too-many-instance-attributes,too-few-public-methods,too-many-branches,locally-disabled,fixme,too-many-boolean-expressions,no-else-return,len-as-condition,inconsistent-return-statements,useless-object-inheritance
 
-max-line-length=100
+max-line-length=120

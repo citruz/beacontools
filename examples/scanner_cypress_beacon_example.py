@@ -1,4 +1,5 @@
 import time
+
 from beacontools import BeaconScanner, IBeaconFilter, CYPRESS_BEACON_DEFAULT_UUID
 
 def callback(bt_addr, rssi, packet, additional_info):
@@ -7,7 +8,8 @@ def callback(bt_addr, rssi, packet, additional_info):
 
 # scan for all iBeacon advertisements from beacons with the specified uuid
 scanner = BeaconScanner(callback,
-                        device_filter=IBeaconFilter(uuid=CYPRESS_BEACON_DEFAULT_UUID))
+    device_filter=IBeaconFilter(uuid=CYPRESS_BEACON_DEFAULT_UUID)
+)
 scanner.start()
 # Cypress beacons by default transmit every 5 minutes
 time.sleep(6*60)

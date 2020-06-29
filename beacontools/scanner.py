@@ -14,7 +14,7 @@ from .utils import is_packet_type, is_one_of, to_int, bin_to_int, get_mode
 from .const import (ScannerMode, ScanType, ScanFilter, BluetoothAddressType,
                     LE_META_EVENT, OGF_LE_CTL, OCF_LE_SET_SCAN_ENABLE,
                     OCF_LE_SET_SCAN_PARAMETERS, EVT_LE_ADVERTISING_REPORT,
-                    MS_FRACTION_DIVIDER,)
+                    MS_FRACTION_DIVIDER, EXPOSURE_NOTIFICATION_UUID)
 
 
 _LOGGER = logging.getLogger(__name__)
@@ -26,7 +26,7 @@ _LOGGER.setLevel(logging.DEBUG)
 class BeaconScanner(object):
     """Scan for Beacon advertisements."""
 
-    def __init__(self, callback, bt_device_id=0, device_filter=None, packet_filter=None):
+    def __init__(self, callback, bt_device_id=0, device_filter=None, packet_filter=None, scan_parameters=None):
         """Initialize scanner."""
         # check if device filters are valid
         if device_filter is not None:
@@ -50,7 +50,10 @@ class BeaconScanner(object):
             else:
                 packet_filter = None
 
-        self._mon = Monitor(callback, bt_device_id, device_filter, packet_filter)
+        if scan_parameters is None:
+            scan_parameters = {}
+
+        self._mon = Monitor(callback, bt_device_id, device_filter, packet_filter, scan_parameters)
 
     def start(self):
         """Start beacon scanning."""
@@ -64,10 +67,10 @@ class BeaconScanner(object):
 class Monitor(threading.Thread):
     """Continously scan for BLE advertisements."""
 
-    def __init__(self, callback, bt_device_id, device_filter, packet_filter):
+    def __init__(self, callback, bt_device_id, device_filter, packet_filter, scan_parameters):
         """Construct interface object."""
         # do import here so that the package can be used in parsing-only mode (no bluez required)
-        self.bluez = import_module('bluetooth._bluetooth')
+        self.backend = import_module('beacontools.backend')
 
         threading.Thread.__init__(self)
         self.daemon = False
@@ -85,17 +88,14 @@ class Monitor(threading.Thread):
         self.socket = None
         # keep track of Eddystone Beacon <-> bt addr mapping
         self.eddystone_mappings = []
+        # parameters to pass to bt device
+        self.scan_parameters = scan_parameters
 
     def run(self):
         """Continously scan for BLE advertisements."""
-        self.socket = self.bluez.hci_open_dev(self.bt_device_id)
+        self.socket = self.backend.open_dev(self.bt_device_id)
 
-        filtr = self.bluez.hci_filter_new()
-        self.bluez.hci_filter_all_events(filtr)
-        self.bluez.hci_filter_set_ptype(filtr, self.bluez.HCI_EVENT_PKT)
-        self.socket.setsockopt(self.bluez.SOL_HCI, self.bluez.HCI_FILTER, filtr)
-
-        self.set_scan_parameters()
+        self.set_scan_parameters(**self.scan_parameters)
         self.toggle_scan(True)
 
         while self.keep_going:
@@ -141,14 +141,13 @@ class Monitor(threading.Thread):
         interval_fractions, window_fractions = int(interval_fractions), int(window_fractions)
 
         scan_parameter_pkg = struct.pack(
-            ">BHHBB",
+            "<BHHBB",
             scan_type,
             interval_fractions,
             window_fractions,
             address_type,
             filter_type)
-        self.bluez.hci_send_cmd(self.socket, OGF_LE_CTL, OCF_LE_SET_SCAN_PARAMETERS,
-                                scan_parameter_pkg)
+        self.backend.send_cmd(self.socket, OGF_LE_CTL, OCF_LE_SET_SCAN_PARAMETERS, scan_parameter_pkg)
 
     def toggle_scan(self, enable, filter_duplicates=False):
         """Enables or disables BLE scanning
@@ -157,8 +156,8 @@ class Monitor(threading.Thread):
             enable: boolean value to enable (True) or disable (False) scanner
             filter_duplicates: boolean value to enable/disable filter, that
                 omits duplicated packets"""
-        command = struct.pack(">BB", enable, filter_duplicates)
-        self.bluez.hci_send_cmd(self.socket, OGF_LE_CTL, OCF_LE_SET_SCAN_ENABLE, command)
+        command = struct.pack("BB", enable, filter_duplicates)
+        self.backend.send_cmd(self.socket, OGF_LE_CTL, OCF_LE_SET_SCAN_ENABLE, command)
 
     def process_packet(self, pkt):
         """Parse the packet and call callback if one of the filters matches."""
@@ -170,6 +169,7 @@ class Monitor(threading.Thread):
             ((self.mode & ScannerMode.MODE_EDDYSTONE) and (pkt[19:21] == b"\xaa\xfe")) or \
             ((self.mode & ScannerMode.MODE_ESTIMOTE) and (pkt[23:25] == b"\x5d\x01")) or \
             ((self.mode & ScannerMode.MODE_CJMONITOR) and (pkt[27:29] == b"\xfe\x10")) or \
+            ((self.mode & ScannerMode.MODE_EXPOSURE_NOTIFICATION) and (pkt[19:21] == EXPOSURE_NOTIFICATION_UUID)) or \
             ((self.mode & ScannerMode.MODE_ESTIMOTE) and (pkt[19:21] == b"\x9a\xfe"))):
             return
 

@@ -98,8 +98,7 @@ class EddystoneTLMFrame(object):
 
     def __init__(self, data):
         self._voltage = data['voltage']
-        self._temperature = data['temperature']
-        self._temperature_fixed_point = data['temperature'] / float(256)
+        self._temperature = data['temperature'] / float(256)
         self._advertising_count = data['advertising_count']
         self._seconds_since_boot = data['seconds_since_boot']
 
@@ -112,11 +111,6 @@ class EddystoneTLMFrame(object):
     def temperature(self):
         """Temperature in degree Celsius."""
         return self._temperature
-
-    @property
-    def temperature_fixed_point(self):
-        """Temperature interpreted as 8.8 fixed point decimal."""
-        return self._temperature_fixed_point
 
     @property
     def advertising_count(self):

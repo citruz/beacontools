@@ -10,6 +10,7 @@ Currently supported types are:
 * `iBeacons <https://developer.apple.com/ibeacon/>`__ (Apple and Cypress CYALKIT-E02)
 * `Estimote Beacons (Telemetry and Nearable) <https://github.com/estimote/estimote-specs>`__
 * Control-J Monitor (temp/humidity/light)
+* `COVID-19 Exposure Notifications <https://www.apple.com/covid19/contacttracing>`__
 
 The BeaconTools library has two main components:
 
@@ -24,7 +25,11 @@ If you only want to use the **parser** install the library using pip and you're 
 
     pip install beacontools
     
-If you want to perfom beacon **scanning** there are a few more requirement. First of all you need an OS with bluez (most Linux OS; Windows and macOS are also possible but untested, see the "`Build Requirements <https://github.com/karulis/pybluez>`__" section of pybluez for more information).
+If you want to perfom beacon **scanning** there are a few more requirements.
+First of all, you need a supported OS: currently that's Linux with BlueZ, and FreeBSD.
+Second, you need raw socket access (via Linux capabilities, or by running as root).
+
+A typical Linux installation would look like this:
 
 .. code:: bash
 
@@ -59,20 +64,22 @@ Scanner
 .. code:: python
 
     import time
+
     from beacontools import BeaconScanner, EddystoneTLMFrame, EddystoneFilter
 
     def callback(bt_addr, rssi, packet, additional_info):
         print("<%s, %d> %s %s" % (bt_addr, rssi, packet, additional_info))
 
     # scan for all TLM frames of beacons in the namespace "12345678901234678901"
-    scanner = BeaconScanner(callback, 
+    scanner = BeaconScanner(callback,
+        # remove the following line to see packets from all beacons
         device_filter=EddystoneFilter(namespace="12345678901234678901"),
         packet_filter=EddystoneTLMFrame
     )
     scanner.start()
-
     time.sleep(10)
     scanner.stop()
+
 
 
 .. code:: python
@@ -91,11 +98,40 @@ Scanner
     time.sleep(5)
     scanner.stop()
 
+    # scan for all iBeacon advertisements regardless from which beacon
+    scanner = BeaconScanner(callback,
+        packet_filter=IBeaconAdvertisement
+    )
+    scanner.start()
+    time.sleep(5)
+    scanner.stop()
+
+
+Customizing Scanning Parameters
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Some Bluetooth dongle don't allow scanning in Randomized MAC mode. If you don't receive any scan results, try setting the scan mode to PUBLIC:
+
+.. code:: python
+
+    from beacontools import BeaconScanner, BluetoothAddressType
+
+    scanner = BeaconScanner(
+        callback,
+        scan_parameters={"address_type": BluetoothAddressType.PUBLIC}
+    )
+
+For all available options see ``Monitor.set_scan_parameters``.
 
 Changelog
 ---------
 Beacontools follows the `semantic versioning <https://semver.org/>`__ scheme.
 
+* 2.0.0
+    * Dropped support for Python 2.7 and 3.4
+    * Added support for COVID-19 Exposure Notifications
+    * Added support for FreeBSD and fixed temperature parsing (thanks to `myfreeweb <https://github.com/myfreeweb>`__)
+    * Added support for Control-J Monitor beacons (thanks to `clydebarrow <https://github.com/clydebarrow>`__)
+    * Added support for Estimote Nearables (thanks to `ShaunPlummer <https://github.com/ShaunPlummer>`__)
 * 1.3.1
     * Multiple fixes and internal refactorings, including support for Raspberry Pi 3B+ (huge thanks to `cereal <https://github.com/cereal>`__)
     * Updated dependencies

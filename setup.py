@@ -3,6 +3,7 @@
 from setuptools import setup, find_packages
 from codecs import open
 from os import path
+import sys
 
 here = path.abspath(path.dirname(__file__))
 
@@ -12,7 +13,7 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 setup(
     name='beacontools',
 
-    version='1.3.1',
+    version='2.0.0',
 
     description='A Python library for working with various types of Bluetooth LE Beacons.',
     long_description=long_description,
@@ -32,10 +33,7 @@ setup(
 
         'License :: OSI Approved :: MIT License',
 
-        'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
@@ -54,8 +52,7 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
-        'enum34;python_version<"3.4"',
-        'construct>=2.8.16,<2.10'
+        'construct>=2.9.52,<2.11'
     ],
 
     # List additional groups of dependencies here (e.g. development
@@ -63,14 +60,14 @@ setup(
     # for example:
     # $ pip install -e .[dev,test]
     extras_require={
-        'scan': ['PyBluez==0.22'],
+        'scan': ['PyBluez==0.22'] if sys.platform.startswith("linux") else [],
         'dev': ['check-manifest'],
         'test': [
             'coveralls==1.5.1',
-            'pytest==4.0.2',
-            'pytest-cov==2.6.0',
-            'mock==2.0.0',
-            'check-manifest==0.37',
+            'pytest==5.4.3',
+            'pytest-cov==2.10.0',
+            'mock==3.0.5',
+            'check-manifest==0.42',
             'pylint',
             'readme_renderer',
             'docutils'

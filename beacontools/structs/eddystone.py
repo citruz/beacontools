@@ -21,7 +21,7 @@ EddystoneURLFrame = Struct(
 
 UnencryptedTLMFrame = Struct(
     "voltage" / Int16ub,
-    "temperature" / Int16ul,
+    "temperature" / Int16ub,
     "advertising_count" / Int32ub,
     "seconds_since_boot" / Int32ub,
 )

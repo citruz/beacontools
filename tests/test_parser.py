@@ -3,7 +3,8 @@ import unittest
 
 from beacontools import parse_packet, EddystoneUIDFrame, EddystoneURLFrame, \
                         EddystoneEncryptedTLMFrame, EddystoneTLMFrame, EddystoneEIDFrame, \
-                        IBeaconAdvertisement, EstimoteTelemetryFrameA, EstimoteTelemetryFrameB
+                        IBeaconAdvertisement, EstimoteTelemetryFrameA, EstimoteTelemetryFrameB, \
+                        ExposureNotificationFrame
 from beacontools.packet_types import EstimoteNearable
 
 class TestParser(unittest.TestCase):
@@ -70,7 +71,7 @@ class TestParser(unittest.TestCase):
         frame = parse_packet(tlm_packet)
         self.assertIsInstance(frame, EddystoneTLMFrame)
         self.assertEqual(frame.voltage, 2840)
-        self.assertTrue(abs(frame.temperature_fixed_point - 17.27) < 0.1)
+        self.assertTrue(abs(frame.temperature - 71) < 0.1)
         self.assertEqual(frame.advertising_count, 5223)
         self.assertEqual(frame.seconds_since_boot, 10948)
         self.assertIsNotNone(str(frame))
@@ -233,6 +234,15 @@ class TestParser(unittest.TestCase):
         self.assertEqual(1, frame.firmware_version)
         self.assertEqual(4, frame.hardware_version)
         self.assertFalse(frame.is_moving)
+
+    def test_exposure_notification(self):
+        exposure_packet = b"\x02\x01\x1a\x03\x03\x6f\xfd\x17\x16\x6f\xfd\x0d\x3b\x4f" \
+                          b"\x65\x58\x4c\x58\x21\x60\x57\x1d\xd1\x90\x10\xd4\x1c\x26" \
+                          b"\x60\xee\x34\xd1"
+        frame = parse_packet(exposure_packet)
+        self.assertIsInstance(frame, ExposureNotificationFrame)
+        self.assertEqual("0d3b4f65584c582160571dd19010d41c", frame.identifier)
+        self.assertEqual(b"\x26\x60\xee\x34", frame.encrypted_metadata)
 
 
 if __name__ == "__main__":

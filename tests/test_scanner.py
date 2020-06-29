@@ -11,7 +11,8 @@ except ImportError:
 
 from beacontools import BeaconScanner, EddystoneFilter, EddystoneTLMFrame, EddystoneUIDFrame, \
                         BtAddrFilter, IBeaconFilter, IBeaconAdvertisement, EstimoteFilter, \
-                        EstimoteTelemetryFrameB, EstimoteTelemetryFrameA, CJMonitorFilter, CJMonitorAdvertisement
+                        EstimoteTelemetryFrameB, EstimoteTelemetryFrameA, CJMonitorFilter, CJMonitorAdvertisement, \
+                        ExposureNotificationFilter, ExposureNotificationFrame
 
 class TestScanner(unittest.TestCase):
     """Test the BeaconScanner."""
@@ -313,6 +314,33 @@ class TestScanner(unittest.TestCase):
         self.assertEqual(args[3], {
             "identifier": "47a038d5eb032640",
             "protocol_version": 2
+        })
+
+    def test_process_packet_exposure_notification_filter(self):
+        """Test processing of a exposure notification with device filter."""
+        callback = MagicMock()
+        scanner = BeaconScanner(
+            callback,
+            device_filter=ExposureNotificationFilter(identifier="0d3b4f65584c582160571dd19010d41c")
+        )
+        # correct identifier
+        pkt = b"\x04\x3e\x2b\x02\x01\x03\x01\xe1\xac\xca\x3d\xea\x0d\x1f\x02\x01\x1a\x03\x03\x6f" \
+              b"\xfd\x17\x16\x6f\xfd\x0d\x3b\x4f\x65\x58\x4c\x58\x21\x60\x57\x1d\xd1\x90\x10\xd4" \
+              b"\x1c\x26\x60\xee\x34\xd1"
+        # different identifier
+        pkt2 = b"\x04\x3e\x2b\x02\x01\x03\x01\xe1\xac\xca\x3d\xea\x0d\x1f\x02\x01\x1a\x03\x03\x6f" \
+               b"\xfd\x17\x16\x6f\xfd\x0d\x3b\x40\x65\x58\x4c\x58\x21\x60\x57\x1d\xd1\x90\x10\xd4" \
+               b"\x1c\x26\x60\xee\x34\xd1"
+        scanner._mon.process_packet(pkt)
+        scanner._mon.process_packet(pkt2)
+        self.assertEqual(callback.call_count, 1)
+        args = callback.call_args[0]
+        self.assertEqual(args[0], "0d:ea:3d:ca:ac:e1")
+        self.assertEqual(args[1], -47)
+        self.assertIsInstance(args[2], ExposureNotificationFrame)
+        self.assertEqual(args[3], {
+            "identifier": "0d3b4f65584c582160571dd19010d41c",
+            "encrypted_metadata": b"\x26\x60\xee\x34"
         })
 
     def test_invalid_bt_filter(self):

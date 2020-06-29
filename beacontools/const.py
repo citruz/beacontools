@@ -10,7 +10,8 @@ class ScannerMode(IntEnum):
     MODE_EDDYSTONE = 2
     MODE_ESTIMOTE = 4
     MODE_CJMONITOR = 8
-    MODE_ALL = MODE_IBEACON | MODE_EDDYSTONE | MODE_ESTIMOTE | MODE_CJMONITOR
+    MODE_EXPOSURE_NOTIFICATION = 16
+    MODE_ALL = MODE_IBEACON | MODE_EDDYSTONE | MODE_ESTIMOTE | MODE_CJMONITOR  | MODE_EXPOSURE_NOTIFICATION
 
 
 # hci le scan parameters
@@ -104,3 +105,7 @@ ESTIMOTE_TELEMETRY_SUBFRAME_B = 1
 CJ_SERVICE_UUID = b"\x1A\x18\x00\x18"
 CJ_MANUFACTURER_ID = b"\x72\x04"
 CJ_TEMPHUM_TYPE = 0x10fe
+
+# for COVID-19 Exposure Notifications
+# see https://blog.google/documents/70/Exposure_Notification_-_Bluetooth_Specification_v1.2.2.pdf
+EXPOSURE_NOTIFICATION_UUID = b"\x6f\xfd"

@@ -29,7 +29,7 @@ def data_to_uuid(data):
 
 def data_to_binstring(data):
     """Convert an array of binary data to a binary string."""
-    return array.array('B', data).tostring()
+    return array.array('B', data).tobytes()
 
 def mulaw_to_value(mudata):
     """Convert a mu-law encoded value to linear."""
@@ -40,7 +40,7 @@ def bt_addr_to_string(addr):
     """Convert a binary string to the hex representation."""
     addr_str = array.array('B', addr)
     addr_str.reverse()
-    hex_str = hexlify(addr_str.tostring()).decode('ascii')
+    hex_str = hexlify(addr_str.tobytes()).decode('ascii')
     # insert ":" seperator between the bytes
     return ':'.join(a+b for a, b in zip(hex_str[::2], hex_str[1::2]))
 
@@ -59,11 +59,14 @@ def is_packet_type(cls):
     from .packet_types import EddystoneUIDFrame, EddystoneURLFrame, \
                               EddystoneEncryptedTLMFrame, EddystoneTLMFrame, \
                               EddystoneEIDFrame, IBeaconAdvertisement, \
-                              EstimoteTelemetryFrameA, EstimoteTelemetryFrameB
+                              EstimoteTelemetryFrameA, EstimoteTelemetryFrameB, \
+                              ExposureNotificationFrame
     # pylint: enable=import-outside-toplevel
+
     return (cls in [EddystoneURLFrame, EddystoneUIDFrame, EddystoneEncryptedTLMFrame, \
                     EddystoneTLMFrame, EddystoneEIDFrame, IBeaconAdvertisement, \
-                    EstimoteTelemetryFrameA, EstimoteTelemetryFrameB])
+                    EstimoteTelemetryFrameA, EstimoteTelemetryFrameB, \
+                    ExposureNotificationFrame])
 
 
 def to_int(string):
@@ -85,7 +88,8 @@ def bin_to_int(string):
 def get_mode(device_filter):
     """Determine which beacons the scanner should look for."""
     from .device_filters import IBeaconFilter, EddystoneFilter, BtAddrFilter, EstimoteFilter, \
-                                CJMonitorFilter  # pylint: disable=import-outside-toplevel
+                                CJMonitorFilter, ExposureNotificationFilter  # pylint: disable=import-outside-toplevel
+
     if device_filter is None or len(device_filter) == 0:
         return ScannerMode.MODE_ALL
 
@@ -99,6 +103,8 @@ def get_mode(device_filter):
             mode |= ScannerMode.MODE_ESTIMOTE
         elif isinstance(filtr, CJMonitorFilter):
             mode |= ScannerMode.MODE_CJMONITOR
+        elif isinstance(filtr, ExposureNotificationFilter):
+            mode |= ScannerMode.MODE_EXPOSURE_NOTIFICATION
         elif isinstance(filtr, BtAddrFilter):
             mode |= ScannerMode.MODE_ALL
             break
