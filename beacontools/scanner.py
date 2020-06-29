@@ -26,7 +26,7 @@ _LOGGER.setLevel(logging.DEBUG)
 class BeaconScanner(object):
     """Scan for Beacon advertisements."""
 
-    def __init__(self, callback, bt_device_id=0, device_filter=None, packet_filter=None):
+    def __init__(self, callback, bt_device_id=0, device_filter=None, packet_filter=None, scan_parameters=None):
         """Initialize scanner."""
         # check if device filters are valid
         if device_filter is not None:
@@ -50,7 +50,10 @@ class BeaconScanner(object):
             else:
                 packet_filter = None
 
-        self._mon = Monitor(callback, bt_device_id, device_filter, packet_filter)
+        if scan_parameters is None:
+            scan_parameters = {}
+
+        self._mon = Monitor(callback, bt_device_id, device_filter, packet_filter, scan_parameters)
 
     def start(self):
         """Start beacon scanning."""
@@ -64,7 +67,7 @@ class BeaconScanner(object):
 class Monitor(threading.Thread):
     """Continously scan for BLE advertisements."""
 
-    def __init__(self, callback, bt_device_id, device_filter, packet_filter):
+    def __init__(self, callback, bt_device_id, device_filter, packet_filter, scan_parameters):
         """Construct interface object."""
         # do import here so that the package can be used in parsing-only mode (no bluez required)
         self.backend = import_module('beacontools.backend')
@@ -85,12 +88,14 @@ class Monitor(threading.Thread):
         self.socket = None
         # keep track of Eddystone Beacon <-> bt addr mapping
         self.eddystone_mappings = []
+        # parameters to pass to bt device
+        self.scan_parameters = scan_parameters
 
     def run(self):
         """Continously scan for BLE advertisements."""
         self.socket = self.backend.open_dev(self.bt_device_id)
 
-        self.set_scan_parameters()
+        self.set_scan_parameters(**self.scan_parameters)
         self.toggle_scan(True)
 
         while self.keep_going:
@@ -142,8 +147,7 @@ class Monitor(threading.Thread):
             window_fractions,
             address_type,
             filter_type)
-        self.backend.send_cmd(self.socket, OGF_LE_CTL, OCF_LE_SET_SCAN_PARAMETERS,
-            scan_parameter_pkg)
+        self.backend.send_cmd(self.socket, OGF_LE_CTL, OCF_LE_SET_SCAN_PARAMETERS, scan_parameter_pkg)
 
     def toggle_scan(self, enable, filter_duplicates=False):
         """Enables or disables BLE scanning

@@ -7,7 +7,8 @@ def callback(bt_addr, rssi, packet, additional_info):
     print("<%s, %d> %s %s" % (bt_addr, rssi, packet, additional_info))
 
 # scan for all TLM frames of beacons in the namespace "12345678901234678901"
-scanner = BeaconScanner(callback, 
+scanner = BeaconScanner(
+    callback,
     device_filter=EddystoneFilter(namespace="12345678901234678901"),
     packet_filter=[EddystoneTLMFrame, EddystoneUIDFrame]
 )
@@ -16,7 +17,8 @@ time.sleep(10)
 scanner.stop()
 
 # scan for all URL frames without filtering for a specific beacon
-scanner = BeaconScanner(callback,
+scanner = BeaconScanner(
+    callback,
     packet_filter=EddystoneURLFrame
 )
 scanner.start()
