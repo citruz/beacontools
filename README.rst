@@ -10,6 +10,7 @@ Currently supported types are:
 * `iBeacons <https://developer.apple.com/ibeacon/>`__ (Apple and Cypress CYALKIT-E02)
 * `Estimote Beacons (Telemetry and Nearable) <https://github.com/estimote/estimote-specs>`__
 * Control-J Monitor (temp/humidity/light)
+* `COVID-19 Exposure Notifications <https://www.apple.com/covid19/contacttracing>`__
 
 The BeaconTools library has two main components:
 
@@ -59,20 +60,22 @@ Scanner
 .. code:: python
 
     import time
+
     from beacontools import BeaconScanner, EddystoneTLMFrame, EddystoneFilter
 
     def callback(bt_addr, rssi, packet, additional_info):
         print("<%s, %d> %s %s" % (bt_addr, rssi, packet, additional_info))
 
     # scan for all TLM frames of beacons in the namespace "12345678901234678901"
-    scanner = BeaconScanner(callback, 
+    scanner = BeaconScanner(callback,
+        # remove the following line to see packets from all beacons
         device_filter=EddystoneFilter(namespace="12345678901234678901"),
         packet_filter=EddystoneTLMFrame
     )
     scanner.start()
-
     time.sleep(10)
     scanner.stop()
+
 
 
 .. code:: python
@@ -86,6 +89,14 @@ Scanner
     # scan for all iBeacon advertisements from beacons with the specified uuid 
     scanner = BeaconScanner(callback, 
         device_filter=IBeaconFilter(uuid="e5b9e3a6-27e2-4c36-a257-7698da5fc140")
+    )
+    scanner.start()
+    time.sleep(5)
+    scanner.stop()
+
+    # scan for all iBeacon advertisements regardless from which beacon
+    scanner = BeaconScanner(callback,
+        packet_filter=IBeaconAdvertisement
     )
     scanner.start()
     time.sleep(5)

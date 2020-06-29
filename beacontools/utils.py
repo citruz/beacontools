@@ -58,10 +58,13 @@ def is_packet_type(cls):
     from .packet_types import EddystoneUIDFrame, EddystoneURLFrame, \
                               EddystoneEncryptedTLMFrame, EddystoneTLMFrame, \
                               EddystoneEIDFrame, IBeaconAdvertisement, \
-                              EstimoteTelemetryFrameA, EstimoteTelemetryFrameB
+                              EstimoteTelemetryFrameA, EstimoteTelemetryFrameB, \
+                              ExposureNotificationFrame
+
     return (cls in [EddystoneURLFrame, EddystoneUIDFrame, EddystoneEncryptedTLMFrame, \
                     EddystoneTLMFrame, EddystoneEIDFrame, IBeaconAdvertisement, \
-                    EstimoteTelemetryFrameA, EstimoteTelemetryFrameB])
+                    EstimoteTelemetryFrameA, EstimoteTelemetryFrameB, \
+                    ExposureNotificationFrame])
 
 
 def to_int(string):

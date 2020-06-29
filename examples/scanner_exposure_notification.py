@@ -1,4 +1,5 @@
 import time
+
 from beacontools import BeaconScanner, ExposureNotificationFrame
 
 def callback(bt_addr, rssi, packet, additional_info):
