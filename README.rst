@@ -126,6 +126,8 @@ Changelog
 ---------
 Beacontools follows the `semantic versioning <https://semver.org/>`__ scheme.
 
+* 2.0.1
+    * Removed (unused) rfu field from the Eddystone UID packet, fixes #39
 * 2.0.0
     * Dropped support for Python 2.7 and 3.4
     * Added support for COVID-19 Exposure Notifications
