@@ -10,7 +10,9 @@ EddystoneUIDFrame = Struct(
     "tx_power" / Int8sl,
     "namespace" / Array(10, Byte),
     "instance" / Array(6, Byte),
-    "rfu" / Array(2, Byte)
+    # commented out because it is not used anyway and there seem to be beacons which
+    # don't send it at all (see https://github.com/citruz/beacontools/issues/39)
+    # "rfu" / Array(2, Byte)
 )
 
 EddystoneURLFrame = Struct(
