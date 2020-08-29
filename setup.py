@@ -52,7 +52,8 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
-        'construct>=2.9.52,<2.11'
+        'construct>=2.9.52,<2.11',
+        'ahocorapy==1.6.1'
     ],
 
     # List additional groups of dependencies here (e.g. development

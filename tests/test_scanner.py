@@ -19,7 +19,8 @@ class TestScanner(unittest.TestCase):
 
     def setUp(self):
         # mock import so that tests can run without PyBluez installed
-        sys.modules['bluetooth._bluetooth'] = MagicMock()
+        sys.modules['bluetooth'] = MagicMock()
+        sys.platform = "linux"
 
     def test_invalid_device_filters(self):
         """Test creation of device filters without arguments"""
@@ -395,6 +396,19 @@ class TestScanner(unittest.TestCase):
         scanner._mon.process_packet(pkt)
         self.assertEqual(callback.call_count, 3)
 
+    def test_exposure_notification(self):
+        callback = MagicMock()
+        scanner = BeaconScanner(callback, packet_filter=[ExposureNotificationFrame])
+        # Android and iOS seem to use slightly different packets
+        android_pkt = b"\x04\x3E\x28\x02\x01\x03\x01\xBB\x7E\xB5\x2B\x86\x79\x1C\x03\x03\x6F\xFD\x17\x16"\
+                      b"\x6F\xFD\x2C\xFB\x0D\xE0\x2B\x33\xD2\x0C\x5C\x27\x61\x12\x38\xE2\xD1\x07\x42\xB5"\
+                      b"\x6E\xE5\xB8"
+        scanner._mon.process_packet(android_pkt)
+        ios_pkt = b"\x04\x3E\x2B\x02\x01\x03\x01\x08\xE6\xAE\x33\x0B\x3F\x1F\x02\x01\x1A\x03\x03\x6F"\
+                  b"\xFD\x17\x16\x6F\xFD\xE9\x32\xE8\xB0\x68\x8D\xFA\xEC\x00\x62\xB7\xD6\xD3\x5E\xEF"\
+                  b"\xB5\xEE\xAA\x91\xAC\xBA"
+        scanner._mon.process_packet(ios_pkt)
+        self.assertEqual(callback.call_count, 2)
 
 if __name__ == "__main__":
     unittest.main()
