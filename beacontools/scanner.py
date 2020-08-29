@@ -1,21 +1,26 @@
 """Classes responsible for Beacon scanning."""
-import threading
-import struct
 import logging
+import struct
+import threading
 from importlib import import_module
 
-from .parser import parse_packet
-from .utils import bt_addr_to_string
-from .packet_types import (EddystoneUIDFrame, EddystoneURLFrame,
-                           EddystoneEncryptedTLMFrame, EddystoneTLMFrame,
-                           EddystoneEIDFrame,)
-from .device_filters import BtAddrFilter, DeviceFilter
-from .utils import is_packet_type, is_one_of, to_int, bin_to_int, get_mode
-from .const import (ScannerMode, ScanType, ScanFilter, BluetoothAddressType,
-                    LE_META_EVENT, OGF_LE_CTL, OCF_LE_SET_SCAN_ENABLE,
-                    OCF_LE_SET_SCAN_PARAMETERS, EVT_LE_ADVERTISING_REPORT,
-                    MS_FRACTION_DIVIDER, EXPOSURE_NOTIFICATION_UUID)
+from ahocorapy.keywordtree import KeywordTree
 
+from .const import (CJ_MANUFACTURER_ID, EDDYSTONE_UUID,
+                    ESTIMOTE_MANUFACTURER_ID, ESTIMOTE_UUID,
+                    EVT_LE_ADVERTISING_REPORT, EXPOSURE_NOTIFICATION_UUID,
+                    IBEACON_MANUFACTURER_ID, IBEACON_PROXIMITY_TYPE,
+                    LE_META_EVENT, MANUFACTURER_SPECIFIC_DATA_TYPE,
+                    MS_FRACTION_DIVIDER, OCF_LE_SET_SCAN_ENABLE,
+                    OCF_LE_SET_SCAN_PARAMETERS, OGF_LE_CTL,
+                    BluetoothAddressType, ScanFilter, ScannerMode, ScanType)
+from .device_filters import BtAddrFilter, DeviceFilter
+from .packet_types import (EddystoneEIDFrame, EddystoneEncryptedTLMFrame,
+                           EddystoneTLMFrame, EddystoneUIDFrame,
+                           EddystoneURLFrame)
+from .parser import parse_packet
+from .utils import (bin_to_int, bt_addr_to_string, get_mode, is_one_of,
+                    is_packet_type, to_int)
 
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.setLevel(logging.DEBUG)
@@ -91,6 +96,22 @@ class Monitor(threading.Thread):
         # parameters to pass to bt device
         self.scan_parameters = scan_parameters
 
+        # construct an aho-corasick search tree for efficient prefiltering
+        service_uuid_prefix = b"\x03\x03"
+        self.kwtree = KeywordTree()
+        if self.mode & ScannerMode.MODE_IBEACON:
+            self.kwtree.add(bytes([MANUFACTURER_SPECIFIC_DATA_TYPE]) + IBEACON_MANUFACTURER_ID + IBEACON_PROXIMITY_TYPE)
+        if self.mode & ScannerMode.MODE_EDDYSTONE:
+            self.kwtree.add(service_uuid_prefix + EDDYSTONE_UUID)
+        if self.mode & ScannerMode.MODE_ESTIMOTE:
+            self.kwtree.add(service_uuid_prefix + ESTIMOTE_UUID)
+            self.kwtree.add(bytes([MANUFACTURER_SPECIFIC_DATA_TYPE]) + ESTIMOTE_MANUFACTURER_ID)
+        if self.mode & ScannerMode.MODE_CJMONITOR:
+            self.kwtree.add(bytes([MANUFACTURER_SPECIFIC_DATA_TYPE]) + CJ_MANUFACTURER_ID)
+        if self.mode & ScannerMode.MODE_EXPOSURE_NOTIFICATION:
+            self.kwtree.add(service_uuid_prefix + EXPOSURE_NOTIFICATION_UUID)
+        self.kwtree.finalize()
+
     def run(self):
         """Continously scan for BLE advertisements."""
         self.socket = self.backend.open_dev(self.bt_device_id)
@@ -161,22 +182,16 @@ class Monitor(threading.Thread):
 
     def process_packet(self, pkt):
         """Parse the packet and call callback if one of the filters matches."""
-
+        payload = pkt[14:-1]
         # check if this could be a valid packet before parsing
         # this reduces the CPU load significantly
-        if not ( \
-            ((self.mode & ScannerMode.MODE_IBEACON) and (pkt[19:23] == b"\x4c\x00\x02\x15")) or \
-            ((self.mode & ScannerMode.MODE_EDDYSTONE) and (pkt[19:21] == b"\xaa\xfe")) or \
-            ((self.mode & ScannerMode.MODE_ESTIMOTE) and (pkt[23:25] == b"\x5d\x01")) or \
-            ((self.mode & ScannerMode.MODE_CJMONITOR) and (pkt[27:29] == b"\xfe\x10")) or \
-            ((self.mode & ScannerMode.MODE_EXPOSURE_NOTIFICATION) and (pkt[19:21] == EXPOSURE_NOTIFICATION_UUID)) or \
-            ((self.mode & ScannerMode.MODE_ESTIMOTE) and (pkt[19:21] == b"\x9a\xfe"))):
+        if not self.kwtree.search(payload):
             return
 
         bt_addr = bt_addr_to_string(pkt[7:13])
         rssi = bin_to_int(pkt[-1])
         # strip bluetooth address and parse packet
-        packet = parse_packet(pkt[14:-1])
+        packet = parse_packet(payload)
 
         # return if packet was not an beacon advertisement
         if not packet:
