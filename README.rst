@@ -36,7 +36,7 @@ A typical Linux installation would look like this:
     # install libbluetooth headers and libpcap2
     sudo apt-get install python-dev libbluetooth-dev libcap2-bin
     # grant the python executable permission to access raw socket data
-    sudo setcap 'cap_net_raw,cap_net_admin+eip' $(readlink -f $(which python))
+    sudo setcap 'cap_net_raw,cap_net_admin+eip' "$(readlink -f "$(which python)")"
     # install beacontools with scanning support
     pip install beacontools[scan]
     
