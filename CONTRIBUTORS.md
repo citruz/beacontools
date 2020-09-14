@@ -8,3 +8,4 @@ Many thanks to everyone who contributed to this project:
 - shaun (https://github.com/ShaunPlummer)
 - clydebarrow (https://github.com/clydebarrow)
 - myfreeweb (https://github.com/myfreeweb)
+- cleitonbueno (https://github.com/cleitonbueno)
