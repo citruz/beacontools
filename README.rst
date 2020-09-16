@@ -23,7 +23,7 @@ If you only want to use the **parser** install the library using pip and you're 
 
 .. code:: bash
 
-    pip install beacontools
+    pip3 install beacontools
     
 If you want to perfom beacon **scanning** there are a few more requirements.
 First of all, you need a supported OS: currently that's Linux with BlueZ, and FreeBSD.
@@ -36,9 +36,9 @@ A typical Linux installation would look like this:
     # install libbluetooth headers and libpcap2
     sudo apt-get install python-dev libbluetooth-dev libcap2-bin
     # grant the python executable permission to access raw socket data
-    sudo setcap 'cap_net_raw,cap_net_admin+eip' "$(readlink -f "$(which python)")"
+    sudo setcap 'cap_net_raw,cap_net_admin+eip' "$(readlink -f "$(which python3)")"
     # install beacontools with scanning support
-    pip install beacontools[scan]
+    pip3 install beacontools[scan]
     
 Usage
 -----
