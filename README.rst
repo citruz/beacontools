@@ -29,12 +29,12 @@ If you want to perfom beacon **scanning** there are a few more requirements.
 First of all, you need a supported OS: currently that's Linux with BlueZ, and FreeBSD.
 Second, you need raw socket access (via Linux capabilities, or by running as root).
 
-A typical Linux installation would look like this:
+On a typical Linux installation, it would look like this:
 
 .. code:: bash
 
     # install libbluetooth headers and libpcap2
-    sudo apt-get install python-dev libbluetooth-dev libcap2-bin
+    sudo apt-get install python3-dev libbluetooth-dev libcap2-bin
     # grant the python executable permission to access raw socket data
     sudo setcap 'cap_net_raw,cap_net_admin+eip' "$(readlink -f "$(which python3)")"
     # install beacontools with scanning support
