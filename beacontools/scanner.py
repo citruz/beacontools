@@ -3,6 +3,8 @@ import logging
 import struct
 import threading
 from importlib import import_module
+from enum import IntEnum
+from construct import Struct, Byte, Bytes, GreedyRange, ConstructError
 
 from ahocorapy.keywordtree import KeywordTree
 
@@ -15,7 +17,8 @@ from .const import (CJ_MANUFACTURER_ID, EDDYSTONE_UUID,
                     OCF_LE_SET_SCAN_PARAMETERS, OGF_LE_CTL,
                     BluetoothAddressType, ScanFilter, ScannerMode, ScanType,
                     OCF_LE_SET_EXT_SCAN_PARAMETERS, OCF_LE_SET_EXT_SCAN_ENABLE,
-                    EVT_LE_EXT_ADVERTISING_REPORT)
+                    EVT_LE_EXT_ADVERTISING_REPORT, OGF_INFO_PARAM,
+                    OCF_READ_LOCAL_VERSION, EVT_CMD_COMPLETE)
 from .device_filters import BtAddrFilter, DeviceFilter
 from .packet_types import (EddystoneEIDFrame, EddystoneEncryptedTLMFrame,
                            EddystoneTLMFrame, EddystoneUIDFrame,
@@ -23,6 +26,26 @@ from .packet_types import (EddystoneEIDFrame, EddystoneEncryptedTLMFrame,
 from .parser import parse_packet
 from .utils import (bin_to_int, bt_addr_to_string, get_mode, is_one_of,
                     is_packet_type, to_int)
+
+
+class HCIVersion(IntEnum):
+    """HCI version enumeration
+
+    https://www.bluetooth.com/specifications/assigned-numbers/host-controller-interface/
+    """
+    BT_CORE_SPEC_1_0 = 0
+    BT_CODE_SPEC_1_1 = 1
+    BT_CODE_SPEC_1_2 = 2
+    BT_CORE_SPEC_2_0 = 3
+    BT_CORE_SPEC_2_1 = 4
+    BT_CORE_SPEC_3_0 = 5
+    BT_CORE_SPEC_4_0 = 6
+    BT_CORE_SPEC_4_1 = 7
+    BT_CORE_SPEC_4_2 = 8
+    BT_CORE_SPEC_5_0 = 9
+    BT_CORE_SPEC_5_1 = 10
+    BT_CORE_SPEC_5_2 = 11
+
 
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.setLevel(logging.DEBUG)
@@ -98,7 +121,7 @@ class Monitor(threading.Thread):
         # parameters to pass to bt device
         self.scan_parameters = scan_parameters
         # hci version
-        self.hci_version = 0
+        self.hci_version = HCIVersion.BT_CORE_SPEC_1_0
 
         # construct an aho-corasick search tree for efficient prefiltering
         service_uuid_prefix = b"\x03\x03"
@@ -120,33 +143,22 @@ class Monitor(threading.Thread):
         """Continously scan for BLE advertisements."""
         self.socket = self.backend.open_dev(self.bt_device_id)
 
-        # https://www.bluetooth.com/specifications/assigned-numbers/host-controller-interface/
         self.hci_version = self.get_hci_version()
-        if self.hci_version >= 9:  # Bluetooth Core Specification 5.0 and higher
-            self.set_ext_scan_parameters(**self.scan_parameters)
-            self.toggle_ext_scan(True)
-        else:
-            self.set_scan_parameters(**self.scan_parameters)
-            self.toggle_scan(True)
+        self.set_scan_parameters(**self.scan_parameters)
+        self.toggle_scan(True)
 
         while self.keep_going:
             pkt = self.socket.recv(255)
             event = to_int(pkt[1])
             subevent = to_int(pkt[3])
-            if event == LE_META_EVENT:
-                if subevent == EVT_LE_ADVERTISING_REPORT:
-                    # we have an BLE advertisement
-                    self.process_packet(pkt)
-                elif subevent == EVT_LE_EXT_ADVERTISING_REPORT:
-                    # we have an BLE advertisement
-                    self.process_ext_packet(pkt)
+            if event == LE_META_EVENT and subevent in [EVT_LE_ADVERTISING_REPORT, EVT_LE_EXT_ADVERTISING_REPORT]:
+                # we have an BLE advertisement
+                self.process_packet(pkt)
         self.socket.close()
 
     def get_hci_version(self):
-        from bluetooth import _bluetooth as bluez
-        from construct import Struct, Byte, Bytes, GreedyRange, ConstructError
-
-        LocalVersion = Struct(
+        """Gets the HCI version"""
+        local_version = Struct(
             "status" / Byte,
             "hci_version" / Byte,
             "hci_revision" / Bytes(2),
@@ -155,24 +167,28 @@ class Monitor(threading.Thread):
             "lmp_subversion" / Bytes(2),
         )
 
-        resp = self.backend.send_req(self.socket, bluez.OGF_INFO_PARAM, bluez.OCF_READ_LOCAL_VERSION,
-                                     bluez.EVT_CMD_COMPLETE, LocalVersion.sizeof(), bytes(), 0)
+        resp = self.backend.send_req(self.socket, OGF_INFO_PARAM, OCF_READ_LOCAL_VERSION,
+                                     EVT_CMD_COMPLETE, local_version.sizeof(), bytes(), 0)
         try:
-            return GreedyRange(LocalVersion).parse(resp)[0]["hci_version"]
+            return HCIVersion(GreedyRange(local_version).parse(resp)[0]["hci_version"])
         except ConstructError:
-            return 0
-
+            return HCIVersion.BT_CORE_SPEC_1_0
 
     def set_scan_parameters(self, scan_type=ScanType.ACTIVE, interval_ms=10, window_ms=10,
                             address_type=BluetoothAddressType.RANDOM, filter_type=ScanFilter.ALL):
-        """"sets the le scan parameters
+        """"Sets the le scan parameters
+
+        For extended set scan parameters command additional parameter scanning PHYs has to be provided.
+        The parameter indicates the PHY(s) on which the advertising packets should be received on the
+        primary advertising physical channel. For further information have a look on BT Core 5.1 Specification,
+        page 1439 ( LE Set Extended Scan Parameters command).
 
         Args:
             scan_type: ScanType.(PASSIVE|ACTIVE)
-            interval: ms (as float) between scans (valid range 2.5ms - 10240ms)
+            interval: ms (as float) between scans (valid range 2.5ms - 10240ms or 40.95s for extended version)
                 ..note:: when interval and window are equal, the scan
                     runs continuos
-            window: ms (as float) scan duration (valid range 2.5ms - 10240ms)
+            window: ms (as float) scan duration (valid range 2.5ms - 10240ms or 40.95s for extended version)
             address_type: Bluetooth address type BluetoothAddressType.(PUBLIC|RANDOM)
                 * PUBLIC = use device MAC address
                 * RANDOM = generate a random MAC address and use that
@@ -183,151 +199,77 @@ class Monitor(threading.Thread):
         Raises:
             ValueError: A value had an unexpected format or was not in range
         """
+        max_interval = (0x0004 if self.hci_version < HCIVersion.BT_CORE_SPEC_5_0 else 0xFFFF)
         interval_fractions = interval_ms / MS_FRACTION_DIVIDER
-        if interval_fractions < 0x0004 or interval_fractions > 0x4000:
+        if interval_fractions < 0x0004 or interval_fractions > max_interval:
             raise ValueError(
-                "Invalid interval given {}, must be in range of 2.5ms to 10240ms!".format(
-                    interval_fractions))
+                "Invalid interval given {}, must be in range of 2.5ms to {}ms!".format(
+                    interval_fractions, max_interval * MS_FRACTION_DIVIDER))
         window_fractions = window_ms / MS_FRACTION_DIVIDER
-        if window_fractions < 0x0004 or window_fractions > 0x4000:
+        if window_fractions < 0x0004 or window_fractions > max_interval:
             raise ValueError(
-                "Invalid window given {}, must be in range of 2.5ms to 10240ms!".format(
-                    window_fractions))
+                "Invalid window given {}, must be in range of 2.5ms to {}ms!".format(
+                    window_fractions, max_interval * MS_FRACTION_DIVIDER))
 
         interval_fractions, window_fractions = int(interval_fractions), int(window_fractions)
 
-        scan_parameter_pkg = struct.pack(
-            "<BHHBB",
-            scan_type,
-            interval_fractions,
-            window_fractions,
-            address_type,
-            filter_type)
-        self.backend.send_cmd(self.socket, OGF_LE_CTL, OCF_LE_SET_SCAN_PARAMETERS, scan_parameter_pkg)
+        if self.hci_version < HCIVersion.BT_CORE_SPEC_5_0:
+            command_field = OCF_LE_SET_SCAN_PARAMETERS
+            scan_parameter_pkg = struct.pack(
+                "<BHHBB",
+                scan_type,
+                interval_fractions,
+                window_fractions,
+                address_type,
+                filter_type)
+        else:
+            command_field = OCF_LE_SET_EXT_SCAN_PARAMETERS
+            scan_parameter_pkg = struct.pack(
+                "<BBBBHH",
+                address_type,
+                filter_type,
+                1,  # scan advertisements on the LE 1M PHY
+                scan_type,
+                interval_fractions,
+                window_fractions)
 
-    def set_ext_scan_parameters(self, scan_type=ScanType.ACTIVE, interval_ms=10, window_ms=10,
-                                address_type=BluetoothAddressType.RANDOM, filter_type=ScanFilter.ALL):
-        """"sets the le extened scan parameters
-
-        Args:
-            scan_type: ScanType.(PASSIVE|ACTIVE)
-            interval: ms (as float) between scans (valid range 2.5ms - 40.95s)
-                ..note:: when interval and window are equal, the scan
-                    runs continuos
-            window: ms (as float) scan duration (valid range 2.5ms - 40.95s)
-            address_type: Bluetooth address type BluetoothAddressType.(PUBLIC|RANDOM)
-                * PUBLIC = use device MAC address
-                * RANDOM = generate a random MAC address and use that
-            filter: ScanFilter.(ALL|WHITELIST_ONLY) only ALL is supported, which will
-                return all fetched bluetooth packets (WHITELIST_ONLY is not supported,
-                because OCF_LE_ADD_DEVICE_TO_WHITE_LIST command is not implemented)
-
-        Raises:
-            ValueError: A value had an unexpected format or was not in range
-        """
-        interval_fractions = interval_ms / MS_FRACTION_DIVIDER
-        if interval_fractions < 0x0004 or interval_fractions > 0xFFFF:
-            raise ValueError(
-                "Invalid interval given {}, must be in range of 2.5ms to 40.95s".format(
-                    interval_fractions))
-        window_fractions = window_ms / MS_FRACTION_DIVIDER
-        if window_fractions < 0x0004 or window_fractions > 0xFFFF:
-            raise ValueError(
-                "Invalid window given {}, must be in range of 2.5ms to 40.95s!".format(
-                    window_fractions))
-
-        interval_fractions, window_fractions = int(interval_fractions), int(window_fractions)
-
-        scan_parameter_pkg = struct.pack(
-            "<BBBBHH",
-            address_type,
-            filter_type,
-            1,
-            scan_type,
-            interval_fractions,
-            window_fractions
-            )
-        self.backend.send_cmd(self.socket, OGF_LE_CTL, OCF_LE_SET_EXT_SCAN_PARAMETERS, scan_parameter_pkg)
+        self.backend.send_cmd(self.socket, OGF_LE_CTL, command_field, scan_parameter_pkg)
 
     def toggle_scan(self, enable, filter_duplicates=False):
         """Enables or disables BLE scanning
 
-        Args:
-            enable: boolean value to enable (True) or disable (False) scanner
-            filter_duplicates: boolean value to enable/disable filter, that
-                omits duplicated packets"""
-        command = struct.pack("BB", enable, filter_duplicates)
-        self.backend.send_cmd(self.socket, OGF_LE_CTL, OCF_LE_SET_SCAN_ENABLE, command)
-
-    def toggle_ext_scan(self, enable, filter_duplicates=False, duration = 0, period = 0):
-        """Enables or disables BLE scanning
+        For extended set scan enable command additional parameters duration and period have
+        to be provided. When both are zero, the controller shall continue scanning until
+        scanning is disabled. For non-zero values have a look on BT Core 5.1 Specification,
+        page 1442 (LE Set Extended Scan Enable command).
 
         Args:
             enable: boolean value to enable (True) or disable (False) scanner
             filter_duplicates: boolean value to enable/disable filter, that
                 omits duplicated packets"""
-        command = struct.pack("<BBHH", enable, filter_duplicates, duration, period)
-        self.backend.send_cmd(self.socket, OGF_LE_CTL, OCF_LE_SET_EXT_SCAN_ENABLE, command)
+        if self.hci_version < HCIVersion.BT_CORE_SPEC_5_0:
+            command_field = OCF_LE_SET_SCAN_ENABLE
+            command = struct.pack("BB", enable, filter_duplicates)
+        else:
+            command_field = OCF_LE_SET_EXT_SCAN_ENABLE
+            command = struct.pack("<BBHH", enable, filter_duplicates,
+                                  0,  # duration
+                                  0   # period
+                                  )
+
+        self.backend.send_cmd(self.socket, OGF_LE_CTL, command_field, command)
 
     def process_packet(self, pkt):
         """Parse the packet and call callback if one of the filters matches."""
-        payload = pkt[14:-1]
+        payload = pkt[14:-1] if self.hci_version < HCIVersion.BT_CORE_SPEC_5_0 else pkt[29:]
+
         # check if this could be a valid packet before parsing
         # this reduces the CPU load significantly
         if not self.kwtree.search(payload):
             return
 
         bt_addr = bt_addr_to_string(pkt[7:13])
-        rssi = bin_to_int(pkt[-1])
-        # strip bluetooth address and parse packet
-        packet = parse_packet(payload)
-
-        # return if packet was not an beacon advertisement
-        if not packet:
-            return
-
-        # we need to remeber which eddystone beacon has which bt address
-        # because the TLM and URL frames do not contain the namespace and instance
-        self.save_bt_addr(packet, bt_addr)
-        # properties holds the identifying information for a beacon
-        # e.g. instance and namespace for eddystone; uuid, major, minor for iBeacon
-        properties = self.get_properties(packet, bt_addr)
-
-        if self.device_filter is None and self.packet_filter is None:
-            # no filters selected
-            self.callback(bt_addr, rssi, packet, properties)
-
-        elif self.device_filter is None:
-            # filter by packet type
-            if is_one_of(packet, self.packet_filter):
-                self.callback(bt_addr, rssi, packet, properties)
-        else:
-            # filter by device and packet type
-            if self.packet_filter and not is_one_of(packet, self.packet_filter):
-                # return if packet filter does not match
-                return
-
-            # iterate over filters and call .matches() on each
-            for filtr in self.device_filter:
-                if isinstance(filtr, BtAddrFilter):
-                    if filtr.matches({'bt_addr':bt_addr}):
-                        self.callback(bt_addr, rssi, packet, properties)
-                        return
-
-                elif filtr.matches(properties):
-                    self.callback(bt_addr, rssi, packet, properties)
-                    return
-
-    def process_ext_packet(self, pkt):
-        """Parse the packet and call callback if one of the filters matches."""
-        payload = pkt[29:]
-        # check if this could be a valid packet before parsing
-        # this reduces the CPU load significantly
-        if not self.kwtree.search(payload):
-            return
-
-        bt_addr = bt_addr_to_string(pkt[7:13])
-        rssi = bin_to_int(pkt[18])
+        rssi = bin_to_int(pkt[-1] if self.hci_version < HCIVersion.BT_CORE_SPEC_5_0 else pkt[18])
         # strip bluetooth address and parse packet
         packet = parse_packet(payload)
 
@@ -394,9 +336,6 @@ class Monitor(threading.Thread):
 
     def terminate(self):
         """Signal runner to stop and join thread."""
-        if self.hci_version >= 9:  # Bluetooth Core Specification 5.0 and higher
-            self.toggle_ext_scan(False)
-        else:
-            self.toggle_scan(False)
+        self.toggle_scan(False)
         self.keep_going = False
         self.join()
