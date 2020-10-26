@@ -199,7 +199,7 @@ class Monitor(threading.Thread):
         Raises:
             ValueError: A value had an unexpected format or was not in range
         """
-        max_interval = (0x0004 if self.hci_version < HCIVersion.BT_CORE_SPEC_5_0 else 0xFFFF)
+        max_interval = (0x4000 if self.hci_version < HCIVersion.BT_CORE_SPEC_5_0 else 0xFFFF)
         interval_fractions = interval_ms / MS_FRACTION_DIVIDER
         if interval_fractions < 0x0004 or interval_fractions > max_interval:
             raise ValueError(
