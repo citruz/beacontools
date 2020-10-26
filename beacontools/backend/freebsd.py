@@ -55,3 +55,7 @@ def send_cmd(sock, group_field, command_field, data):
     """Send hci command to device."""
     opcode = (((group_field & 0x3f) << 10) | (command_field & 0x3ff))
     sock.send(struct.pack('<BHB', 1, opcode, len(data)) + data)
+
+def send_req(_socket, _group_field, _command_field, _event, _rlen, _params, _timeout):
+    """Support for HCI 5 has not been implemented yet for FreeBSD, pull requests are wellcome"""
+    raise NotImplementedError("send_req has not been implemented yet for FreeBSD")

@@ -167,11 +167,11 @@ class Monitor(threading.Thread):
             "lmp_subversion" / Bytes(2),
         )
 
-        resp = self.backend.send_req(self.socket, OGF_INFO_PARAM, OCF_READ_LOCAL_VERSION,
-                                     EVT_CMD_COMPLETE, local_version.sizeof(), bytes(), 0)
         try:
+            resp = self.backend.send_req(self.socket, OGF_INFO_PARAM, OCF_READ_LOCAL_VERSION,
+                                         EVT_CMD_COMPLETE, local_version.sizeof(), bytes(), 0)
             return HCIVersion(GreedyRange(local_version).parse(resp)[0]["hci_version"])
-        except ConstructError:
+        except (ConstructError, NotImplementedError):
             return HCIVersion.BT_CORE_SPEC_1_0
 
     def set_scan_parameters(self, scan_type=ScanType.ACTIVE, interval_ms=10, window_ms=10,
