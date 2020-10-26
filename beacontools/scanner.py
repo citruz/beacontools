@@ -50,7 +50,7 @@ class HCIVersion(IntEnum):
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.setLevel(logging.DEBUG)
 
-# pylint: disable=no-member,too-many-arguments
+# pylint: disable=no-member
 
 
 class BeaconScanner(object):
