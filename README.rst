@@ -126,6 +126,8 @@ Changelog
 ---------
 Beacontools follows the `semantic versioning <https://semver.org/>`__ scheme.
 
+* 2.1.0
+    * Added support for extended BLE commands for devices using HCI >= 5.0 (Linux only, thanks to `idaniel86 <https://github.com/idaniel86>`__)
 * 2.0.2
     * Improved prefiltering of packets, fixes #48
 * 2.0.1

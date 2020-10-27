@@ -9,3 +9,4 @@ Many thanks to everyone who contributed to this project:
 - clydebarrow (https://github.com/clydebarrow)
 - myfreeweb (https://github.com/myfreeweb)
 - cleitonbueno (https://github.com/cleitonbueno)
+- idaniel86 (https://github.com/idaniel86)
