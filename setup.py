@@ -61,7 +61,14 @@ setup(
     # for example:
     # $ pip install -e .[dev,test]
     extras_require={
-        'scan': ['PyBluez==0.23'] if sys.platform.startswith("linux") else [],
+        'scan': [
+            # linux
+            'PyBluez==0.23;platform_system=="Linux"',
+            # macOS
+            'pyobjc-core;platform_system=="Darwin"',
+            'pyobjc-framework-CoreBluetooth;platform_system=="Darwin"',
+            'pyobjc-framework-libdispatch;platform_system=="Darwin"',
+        ],
         'dev': ['check-manifest'],
         'test': [
             'coveralls~=2.1',
