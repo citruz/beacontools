@@ -72,7 +72,7 @@ class MonitorMacOS(MonitorBase):
         delegate = CentralManagerDelegate.alloc().init()
         delegate.process_packet = self.process_packet
 
-        self.manager:CBCentralManager = CBCentralManager.alloc() \
+        self.manager = CBCentralManager.alloc() \
             .initWithDelegate_queue_(delegate, dispatch_queue_create(b"scanner_queue", None))
         while self.manager.state() != CBManagerStatePoweredOn:
             print(f"state: {self.manager.state()}")
