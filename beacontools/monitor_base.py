@@ -55,11 +55,9 @@ class MonitorBase(threading.Thread):
 
         # check if this could be a valid packet before parsing
         # this reduces the CPU load significantly
-        print("process packet")
         if not self.kwtree.search(payload):
             return
 
-        print("pass")
         # strip bluetooth address and parse packet
         packet = parse_packet(payload)
 
