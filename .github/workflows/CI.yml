@@ -36,26 +36,7 @@ jobs:
       run: |
         check-manifest --ignore tox.ini,pylintrc,requirements_test.txt,tests/*
     - name: Test with pytest
-      env:
-        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
       run: |
-        pytest --cov beacontools
-        coveralls
-
-  coveralls_finish:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.7'
-    - name: Install Coveralls
-      run: |
-        python -m pip install --upgrade pip
-        pip install coveralls PyYAML
-    - name: Finish Coveralls
-      env:
-        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
-      run: |
-        coveralls --finish
+        pytest --cov-report=xml --cov beacontools
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v1
