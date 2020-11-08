@@ -170,9 +170,9 @@ Beacontools follows the `semantic versioning <https://semver.org/>`__ scheme.
 
 .. |PyPI Package| image:: https://badge.fury.io/py/beacontools.svg
   :target: https://pypi.python.org/pypi/beacontools/
-.. |Build Status| image:: https://travis-ci.org/citruz/beacontools.svg?branch=master
-    :target: https://travis-ci.org/citruz/beacontools
-.. |Coverage Status| image:: https://coveralls.io/repos/github/citruz/beacontools/badge.svg?branch=master
-  :target: https://coveralls.io/github/citruz/beacontools?branch=master
+.. |Build Status| image:: https://github.com/citruz/beacontools/workflows/build/badge.svg
+  :target: https://github.com/citruz/beacontools/actions?query=workflow%build
+.. |Coverage Status| image:: https://codecov.io/gh/citruz/beacontools/branch/master/graph/badge.svg?token=ND6leyavyt
+  :target: https://codecov.io/gh/citruz/beacontools
 .. |Requirements Status| image:: https://requires.io/github/citruz/beacontools/requirements.svg?branch=master
   :target: https://requires.io/github/citruz/beacontools/requirements/?branch=master

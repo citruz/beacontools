@@ -8,3 +8,6 @@ disable=cyclic-import,too-many-instance-attributes,
     useless-object-inheritance,too-many-arguments
 
 max-line-length=120
+
+# these cannot be imported on all OSes
+ignored-modules=objc,CoreBluetooth,Foundation,libdispatch,bluetooth
