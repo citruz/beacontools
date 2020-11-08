@@ -75,8 +75,7 @@ class MonitorMacOS(MonitorBase):
         self.manager = CBCentralManager.alloc() \
             .initWithDelegate_queue_(delegate, dispatch_queue_create(b"scanner_queue", None))
         while self.manager.state() != CBManagerStatePoweredOn:
-            print(f"state: {self.manager.state()}")
-            time.sleep(1)
+            time.sleep(0.1)
 
         self.toggle_scan(True)
 

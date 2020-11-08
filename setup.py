@@ -74,6 +74,7 @@ setup(
             'coveralls~=2.1',
             'pytest~=6.0',
             'pytest-cov~=2.10',
+            'PyYAML',
             'check-manifest',
             'pylint',
             'readme_renderer',
