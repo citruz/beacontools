@@ -1,4 +1,4 @@
-name: beacontools
+name: build
 
 on: [push]
 
