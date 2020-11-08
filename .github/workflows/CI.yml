@@ -28,13 +28,17 @@ jobs:
         pip install .[scan,dev,test]
     - name: Lint with pylint
       run: |
-        pylint
+        pylint beacontools
     - name: Check setup.py
       run: |
         python setup.py check -m -r -s
+    - name: Check manifest
+      run: |
+        check-manifest --ignore tox.ini,pylintrc,requirements_test.txt,tests/*
     - name: Test with pytest
       run: |
         pytest --cov beacontools
-    - name: Check manufest
-      run: |
-        check-manifest --ignore tox.ini,pylintrc,requirements_test.txt,tests/*
+    - name: Coveralls
+      uses: coverallsapp/github-action@master
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}

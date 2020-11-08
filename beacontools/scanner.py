@@ -40,10 +40,10 @@ class BeaconScanner(object):
             scan_parameters = {}
 
         if sys.platform == "darwin":
-            from .monitor_macos import MonitorMacOS
+            from .monitor_macos import MonitorMacOS  # pylint: disable=import-outside-toplevel
             self._mon = MonitorMacOS(callback, device_filter, packet_filter, scan_parameters)
         else:
-            from .monitor_hci import MonitorHci
+            from .monitor_hci import MonitorHci  # pylint: disable=import-outside-toplevel
             self._mon = MonitorHci(callback, bt_device_id, device_filter, packet_filter, scan_parameters)
 
     def start(self):

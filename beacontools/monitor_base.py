@@ -1,5 +1,5 @@
+"""Base class for the Monitoring component"""
 import threading
-from importlib import import_module
 
 from ahocorapy.keywordtree import KeywordTree
 
@@ -8,12 +8,12 @@ from .const import (CJ_MANUFACTURER_ID, EDDYSTONE_UUID,
                     EXPOSURE_NOTIFICATION_UUID,
                     IBEACON_MANUFACTURER_ID, IBEACON_PROXIMITY_TYPE,
                     MANUFACTURER_SPECIFIC_DATA_TYPE, ScannerMode)
-from .device_filters import BtAddrFilter, DeviceFilter
+from .device_filters import BtAddrFilter
 from .packet_types import (EddystoneEIDFrame, EddystoneEncryptedTLMFrame,
                            EddystoneTLMFrame, EddystoneUIDFrame,
                            EddystoneURLFrame)
 from .parser import parse_packet
-from .utils import (bin_to_int, bt_addr_to_string, get_mode, is_one_of)
+from .utils import get_mode, is_one_of
 
 class MonitorBase(threading.Thread):
     """Continously scan for BLE advertisements."""
@@ -94,7 +94,7 @@ class MonitorBase(threading.Thread):
                     if filtr.matches({'bt_addr':bt_addr}):
                         self.callback(bt_addr, rssi, packet, properties)
                         return
- 
+
                 elif filtr.matches(properties):
                     self.callback(bt_addr, rssi, packet, properties)
                     return
@@ -131,4 +131,5 @@ class MonitorBase(threading.Thread):
         self.join()
 
     def toggle_scan(self, _enable):
+        """Start or stop the scan"""
         raise NotImplementedError("This must be implemented by the OS specific monitor")

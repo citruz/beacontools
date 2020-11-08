@@ -1,5 +1,5 @@
 """Backend for Linux using bluez"""
-from bluetooth import _bluetooth as bluez
+from bluetooth import _bluetooth as bluez  # pylint: disable=import-error
 
 # pylint: disable=c-extension-no-member
 

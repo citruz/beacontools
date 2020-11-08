@@ -1,30 +1,28 @@
-from enum import IntEnum
+"""Monitoring class for macOS using CoreBluetooth"""
 import struct
-import struct
-import objc
-from CoreBluetooth import CBCentralManager, NSObject, CBManagerStatePoweredOn, CBPeripheral,\
-        CBAdvertisementDataServiceDataKey, CBUUID, CBAdvertisementDataManufacturerDataKey
-from Foundation import NSDictionary, NSNumber
-
-from libdispatch import dispatch_queue_create, DISPATCH_QUEUE_SERIAL
-
-from .const import SERVICE_DATA_TYPE, EXPOSURE_NOTIFICATION_UUID, MANUFACTURER_SPECIFIC_DATA_TYPE, COMPLETE_SERVICE_UUIDS_DATA_TYPE
-
 import time
 
-#from .backend import CentralManagerDelegate
+# pylint: disable=no-name-in-module
+import objc
+from CoreBluetooth import CBCentralManager, NSObject, CBManagerStatePoweredOn, CBPeripheral,\
+        CBAdvertisementDataServiceDataKey, CBAdvertisementDataManufacturerDataKey
+from Foundation import NSDictionary, NSNumber
+from libdispatch import dispatch_queue_create
+# pylint: enable=no-name-in-module
+
+from .const import SERVICE_DATA_TYPE, MANUFACTURER_SPECIFIC_DATA_TYPE, COMPLETE_SERVICE_UUIDS_DATA_TYPE
 from .monitor_base import MonitorBase
-from .utils import (bin_to_int, bt_addr_to_string, to_int)
+
 
 CBCentralManagerDelegate = objc.protocolNamed("CBCentralManagerDelegate")
 
 
 class CentralManagerDelegate(NSObject, protocols=[CBCentralManagerDelegate]):
-    def centralManagerDidUpdateState_(self, _manager):
+    """Delegate that receives callbacks from the OS"""
+    def centralManagerDidUpdateState_(self, _manager):  # pylint: disable=invalid-name
         """Not interesting for now"""
-        pass
 
-    def centralManager_didDiscoverPeripheral_advertisementData_RSSI_(
+    def centralManager_didDiscoverPeripheral_advertisementData_RSSI_(  # pylint: disable=invalid-name
             self, _manager: CBCentralManager, peripheral: CBPeripheral, adv_data: NSDictionary, rssi: NSNumber):
         """Callback that is being invoked by CoreBluetooth."""
         if not adv_data:
@@ -74,7 +72,8 @@ class MonitorMacOS(MonitorBase):
         delegate = CentralManagerDelegate.alloc().init()
         delegate.process_packet = self.process_packet
 
-        self.manager:CBCentralManager = CBCentralManager.alloc().initWithDelegate_queue_(delegate, dispatch_queue_create(b"scanner_queue", None))
+        self.manager:CBCentralManager = CBCentralManager.alloc() \
+            .initWithDelegate_queue_(delegate, dispatch_queue_create(b"scanner_queue", None))
         while self.manager.state() != CBManagerStatePoweredOn:
             print(f"state: {self.manager.state()}")
             time.sleep(1)

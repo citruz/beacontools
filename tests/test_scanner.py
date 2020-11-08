@@ -65,9 +65,9 @@ class TestScanner(unittest.TestCase):
         """Test processing of a packet and callback execution."""
         callback = MagicMock()
         scanner = BeaconScanner(callback)
-        pkt = b"\x41\x3e\x41\x02\x01\x03\x01\x35\x94\xef\xcd\xd6\x1c\x19\x02\x01\x06\x03\x03\xaa"\
+        pkt = b"\x02\x01\x06\x03\x03\xaa"\
               b"\xfe\x11\x16\xaa\xfe\x20\x00\x0b\x18\x13\x00\x00\x00\x14\x67\x00\x00\x2a\xc4\xe4"
-        scanner._mon.process_packet(pkt)
+        scanner._mon.process_packet(pkt, "1c:d6:cd:ef:94:35", -28)
         self.assertEqual(callback.call_count, 1)
         args = callback.call_args[0]
         self.assertEqual(args[0], "1c:d6:cd:ef:94:35")
@@ -79,10 +79,10 @@ class TestScanner(unittest.TestCase):
         """Test processing of a packet and callback execution with device filter."""
         callback = MagicMock()
         scanner = BeaconScanner(callback, device_filter=EddystoneFilter(instance="000000000001"))
-        pkt = b"\x41\x3e\x41\x02\x01\x03\x01\x35\x94\xef\xcd\xd6\x1c\x19\x02\x01\x06\x03\x03\xaa"\
+        pkt = b"\x02\x01\x06\x03\x03\xaa"\
               b"\xfe\x11\x16\xaa\xfe\x00\xe3\x12\x34\x56\x78\x90\x12\x34\x67\x89\x01\x00\x00\x00"\
               b"\x00\x00\x01\x00\x00\xdd"
-        scanner._mon.process_packet(pkt)
+        scanner._mon.process_packet(pkt, "1c:d6:cd:ef:94:35", -35)
         self.assertEqual(callback.call_count, 1)
         args = callback.call_args[0]
         self.assertEqual(args[0], "1c:d6:cd:ef:94:35")
@@ -97,19 +97,19 @@ class TestScanner(unittest.TestCase):
         """Test processing of a packet and callback execution."""
         callback = MagicMock()
         scanner = BeaconScanner(callback, device_filter=EddystoneFilter(instance="000000000001"))
-        pkt = b"\x41\x3e\x41\x02\x01\x03\x01\x35\x94\xef\xcd\xd6\x1c\x19\x02\x01\x06\x03\x03\xaa"\
+        pkt = b"\x02\x01\x06\x03\x03\xaa"\
               b"\xfe\x11\x16\xaa\xfe\x20\x00\x0b\x18\x13\x00\x00\x00\x14\x67\x00\x00\x2a\xc4\xe4"
-        scanner._mon.process_packet(pkt)
+        scanner._mon.process_packet(pkt, "1c:d6:cd:ef:94:35", -35)
         callback.assert_not_called()
 
     def test_process_packet_dev_filter3(self):
         """Test processing of a packet and callback execution with ibeacon device filter."""
         callback = MagicMock()
         scanner = BeaconScanner(callback, device_filter=IBeaconFilter(major=1))
-        pkt = b"\x41\x3e\x41\x02\x01\x03\x01\x35\x94\xef\xcd\xd6\x1c\x19\x02\x01\x06\x1a\xff\x4c"\
+        pkt = b"\x02\x01\x06\x1a\xff\x4c"\
               b"\x00\x02\x15\x41\x42\x43\x44\x45\x46\x47\x48\x49\x40\x41\x42\x43\x44\x45\x46\x00"\
               b"\x01\x00\x02\xf8\xdd"
-        scanner._mon.process_packet(pkt)
+        scanner._mon.process_packet(pkt, "1c:d6:cd:ef:94:35", -35)
         self.assertEqual(callback.call_count, 1)
         args = callback.call_args[0]
         self.assertEqual(args[0], "1c:d6:cd:ef:94:35")
@@ -125,11 +125,10 @@ class TestScanner(unittest.TestCase):
         """Test processing of a packet and callback execution with cj Monitor device filter."""
         callback = MagicMock()
         scanner = BeaconScanner(callback, device_filter=CJMonitorFilter())
-        pkt = b"\x04\x3e\x29\x02\x01\x00\x00\x43\x56\x5b\x57\x0b\x00\x1d" \
-              b"\x02\x01\x06\x05\x02\x1a\x18\x00\x18" \
+        pkt = b"\x02\x01\x06\x05\x02\x1a\x18\x00\x18" \
               b"\x09\xff\x72\x04\xfe\x10\xbc\x0c\x37\x59" \
               b"\x09\x09\x4d\x6f\x6e\x20\x35\x36\x34\x33\xaa"
-        scanner._mon.process_packet(pkt)
+        scanner._mon.process_packet(pkt, "00:0b:57:5b:56:43", -86)
         self.assertEqual(1, callback.call_count)
         args = callback.call_args[0]
         self.assertEqual("00:0b:57:5b:56:43", args[0])
@@ -147,7 +146,7 @@ class TestScanner(unittest.TestCase):
             args[3])
         # Test same packet with different beacon type, should be ignored.
         scanner = BeaconScanner(callback, device_filter=CJMonitorFilter(beacon_type=4351))
-        scanner._mon.process_packet(pkt)
+        scanner._mon.process_packet(pkt, "1c:d6:cd:ef:94:35", -35)
         self.assertEqual(1, callback.call_count)
 
     def test_process_packet_dev_packet(self):
@@ -158,10 +157,10 @@ class TestScanner(unittest.TestCase):
             device_filter=EddystoneFilter(namespace="12345678901234678901"),
             packet_filter=EddystoneUIDFrame
         )
-        pkt = b"\x41\x3e\x41\x02\x01\x03\x01\x35\x94\xef\xcd\xd6\x1c\x19\x02\x01\x06\x03\x03\xaa"\
+        pkt = b"\x02\x01\x06\x03\x03\xaa"\
               b"\xfe\x11\x16\xaa\xfe\x00\xe3\x12\x34\x56\x78\x90\x12\x34\x67\x89\x01\x00\x00\x00"\
               b"\x00\x00\x01\x00\x00\xdd"
-        scanner._mon.process_packet(pkt)
+        scanner._mon.process_packet(pkt, "1c:d6:cd:ef:94:35", -35)
         self.assertEqual(callback.call_count, 1)
         args = callback.call_args[0]
         self.assertEqual(args[0], "1c:d6:cd:ef:94:35")
@@ -179,10 +178,10 @@ class TestScanner(unittest.TestCase):
             callback,
             packet_filter=EddystoneUIDFrame
         )
-        pkt = b"\x41\x3e\x41\x02\x01\x03\x01\x35\x94\xef\xcd\xd6\x1c\x19\x02\x01\x06\x03\x03\xaa"\
+        pkt = b"\x02\x01\x06\x03\x03\xaa"\
               b"\xfe\x11\x16\xaa\xfe\x00\xe3\x12\x34\x56\x78\x90\x12\x34\x67\x89\x01\x00\x00\x00"\
               b"\x00\x00\x01\x00\x00\xdd"
-        scanner._mon.process_packet(pkt)
+        scanner._mon.process_packet(pkt, "1c:d6:cd:ef:94:35", -35)
         self.assertEqual(callback.call_count, 1)
         args = callback.call_args[0]
         self.assertEqual(args[0], "1c:d6:cd:ef:94:35")
@@ -200,10 +199,10 @@ class TestScanner(unittest.TestCase):
             callback,
             packet_filter=EddystoneTLMFrame
         )
-        pkt = b"\x41\x3e\x41\x02\x01\x03\x01\x35\x94\xef\xcd\xd6\x1c\x19\x02\x01\x06\x03\x03\xaa"\
+        pkt = b"\x02\x01\x06\x03\x03\xaa"\
               b"\xfe\x11\x16\xaa\xfe\x00\xe3\x12\x34\x56\x78\x90\x12\x34\x67\x89\x01\x00\x00\x00"\
               b"\x00\x00\x01\x00\x00\xdd"
-        scanner._mon.process_packet(pkt)
+        scanner._mon.process_packet(pkt, "1c:d6:cd:ef:94:35", -35)
         callback.assert_not_called()
 
     def test_repr_filter(self):
@@ -224,10 +223,10 @@ class TestScanner(unittest.TestCase):
             callback,
             device_filter=BtAddrFilter("1c:d6:cd:ef:94:35")
         )
-        pkt = b"\x41\x3e\x41\x02\x01\x03\x01\x35\x94\xef\xcd\xd6\x1c\x19\x02\x01\x06\x03\x03\xaa"\
+        pkt = b"\x02\x01\x06\x03\x03\xaa"\
               b"\xfe\x11\x16\xaa\xfe\x00\xe3\x12\x34\x56\x78\x90\x12\x34\x67\x89\x01\x00\x00\x00"\
               b"\x00\x00\x01\x00\x00\xdd"
-        scanner._mon.process_packet(pkt)
+        scanner._mon.process_packet(pkt, "1c:d6:cd:ef:94:35", -35)
         self.assertEqual(callback.call_count, 1)
         args = callback.call_args[0]
         self.assertEqual(args[0], "1c:d6:cd:ef:94:35")
@@ -247,7 +246,7 @@ class TestScanner(unittest.TestCase):
             packet_filter=EddystoneUIDFrame
         )
         pkt = b"\x41\x3e\x41\x02\x01\x03"
-        scanner._mon.process_packet(pkt)
+        scanner._mon.process_packet(pkt, "1c:d6:cd:ef:94:35", -35)
         callback.assert_not_called()
 
     def test_process_packet_bad_packet2(self):
@@ -258,19 +257,18 @@ class TestScanner(unittest.TestCase):
             device_filter=EddystoneFilter(namespace="12345678901234678901"),
             packet_filter=EddystoneUIDFrame
         )
-        pkt = b"\x41\x3e\x41\x02\x01\x03\x01\x35\x94\xef\xcd\xd6\x1c\x19\x02\x01\x06\x03\x03\xaa"\
-              b"\xfe"
-        scanner._mon.process_packet(pkt)
+        pkt = b"\x02\x01\x06\x03\x03\xaa\xfe"
+        scanner._mon.process_packet(pkt, "1c:d6:cd:ef:94:35", -35)
         callback.assert_not_called()
 
     def test_process_packet_estimote_a(self):
         """Test processing of a estimote telemetry a packet and callback execution with packet filter."""
         callback = MagicMock()
         scanner = BeaconScanner(callback, packet_filter=[EstimoteTelemetryFrameB, EstimoteTelemetryFrameA])
-        pkt = b"\x41\x3e\x41\x02\x01\x03\x01\x35\x94\xef\xcd\xd6\x1c\x19\x02\x01\x04\x03\x03\x9a"\
+        pkt = b"\x02\x01\x04\x03\x03\x9a"\
               b"\xfe\x17\x16\x9a\xfe\x12\x47\xa0\x38\xd5\xeb\x03\x26\x40\x00\x00\x01\x41\x44\x47"\
               b"\xf0\x01\x00\x00\x00\xdd"
-        scanner._mon.process_packet(pkt)
+        scanner._mon.process_packet(pkt, "1c:d6:cd:ef:94:35", -35)
         self.assertEqual(callback.call_count, 1)
         args = callback.call_args[0]
         self.assertEqual(args[0], "1c:d6:cd:ef:94:35")
@@ -285,10 +283,10 @@ class TestScanner(unittest.TestCase):
         """Test processing of a estimote telemetry b packet and callback execution with packet filter."""
         callback = MagicMock()
         scanner = BeaconScanner(callback, packet_filter=[EstimoteTelemetryFrameB, EstimoteTelemetryFrameA])
-        pkt = b"\x41\x3e\x41\x02\x01\x03\x01\x35\x94\xef\xcd\xd6\x1c\x19\x02\x01\x04\x03\x03\x9a"\
+        pkt = b"\x02\x01\x04\x03\x03\x9a"\
               b"\xfe\x17\x16\x9a\xfe\x22\x47\xa0\x38\xd5\xeb\x03\x26\x40\x01\xff\xff\xff\xff\x49"\
               b"\x25\x66\xbc\x2e\x50\xdd"
-        scanner._mon.process_packet(pkt)
+        scanner._mon.process_packet(pkt, "1c:d6:cd:ef:94:35", -35)
         self.assertEqual(callback.call_count, 1)
         args = callback.call_args[0]
         self.assertEqual(args[0], "1c:d6:cd:ef:94:35")
@@ -303,10 +301,10 @@ class TestScanner(unittest.TestCase):
         """Test processing of a estimote packet and callback execution with device filter."""
         callback = MagicMock()
         scanner = BeaconScanner(callback, device_filter=EstimoteFilter(protocol_version=2))
-        pkt = b"\x41\x3e\x41\x02\x01\x03\x01\x35\x94\xef\xcd\xd6\x1c\x19\x02\x01\x04\x03\x03\x9a"\
+        pkt = b"\x02\x01\x04\x03\x03\x9a"\
               b"\xfe\x17\x16\x9a\xfe\x22\x47\xa0\x38\xd5\xeb\x03\x26\x40\x01\xff\xff\xff\xff\x49"\
               b"\x25\x66\xbc\x2e\x50\xdd"
-        scanner._mon.process_packet(pkt)
+        scanner._mon.process_packet(pkt, "1c:d6:cd:ef:94:35", -35)
         self.assertEqual(callback.call_count, 1)
         args = callback.call_args[0]
         self.assertEqual(args[0], "1c:d6:cd:ef:94:35")
@@ -325,15 +323,15 @@ class TestScanner(unittest.TestCase):
             device_filter=ExposureNotificationFilter(identifier="0d3b4f65584c582160571dd19010d41c")
         )
         # correct identifier
-        pkt = b"\x04\x3e\x2b\x02\x01\x03\x01\xe1\xac\xca\x3d\xea\x0d\x1f\x02\x01\x1a\x03\x03\x6f" \
+        pkt = b"\x02\x01\x1a\x03\x03\x6f" \
               b"\xfd\x17\x16\x6f\xfd\x0d\x3b\x4f\x65\x58\x4c\x58\x21\x60\x57\x1d\xd1\x90\x10\xd4" \
               b"\x1c\x26\x60\xee\x34\xd1"
         # different identifier
-        pkt2 = b"\x04\x3e\x2b\x02\x01\x03\x01\xe1\xac\xca\x3d\xea\x0d\x1f\x02\x01\x1a\x03\x03\x6f" \
+        pkt2 = b"\x02\x01\x1a\x03\x03\x6f" \
                b"\xfd\x17\x16\x6f\xfd\x0d\x3b\x40\x65\x58\x4c\x58\x21\x60\x57\x1d\xd1\x90\x10\xd4" \
                b"\x1c\x26\x60\xee\x34\xd1"
-        scanner._mon.process_packet(pkt)
-        scanner._mon.process_packet(pkt2)
+        scanner._mon.process_packet(pkt, "0d:ea:3d:ca:ac:e1", -47)
+        scanner._mon.process_packet(pkt2, "0d:ea:3d:ca:ac:e1", -47)
         self.assertEqual(callback.call_count, 1)
         args = callback.call_args[0]
         self.assertEqual(args[0], "0d:ea:3d:ca:ac:e1")
@@ -353,61 +351,61 @@ class TestScanner(unittest.TestCase):
     def test_multiple_filters(self):
         callback = MagicMock()
         scanner = BeaconScanner(callback, device_filter=EstimoteFilter(protocol_version=2), packet_filter=EstimoteTelemetryFrameB)
-        pkt = b"\x41\x3e\x41\x02\x01\x03\x01\x35\x94\xef\xcd\xd6\x1c\x19\x02\x01\x04\x03\x03\x9a"\
+        pkt = b"\x02\x01\x04\x03\x03\x9a"\
               b"\xfe\x17\x16\x9a\xfe\x22\x47\xa0\x38\xd5\xeb\x03\x26\x40\x01\xff\xff\xff\xff\x49"\
               b"\x25\x66\xbc\x2e\x50\xdd"
-        scanner._mon.process_packet(pkt)
-        pkt = b"\x41\x3e\x41\x02\x01\x03\x01\x35\x94\xef\xcd\xd6\x1c\x19\x02\x01\x04\x03\x03\x9a"\
+        scanner._mon.process_packet(pkt, "1c:d6:cd:ef:94:35", -35)
+        pkt = b"\x02\x01\x04\x03\x03\x9a"\
               b"\xfe\x17\x16\x9a\xfe\x12\x47\xa0\x38\xd5\xeb\x03\x26\x40\x00\x00\x01\x41\x44\x47"\
               b"\xf0\x01\x00\x00\x00\xdd"
-        scanner._mon.process_packet(pkt)
-        pkt = b"\x41\x3e\x41\x02\x01\x03\x01\x35\x94\xef\xcd\xd6\x1c\x19\x02\x01\x06\x03\x03\xaa"\
+        scanner._mon.process_packet(pkt, "1c:d6:cd:ef:94:35", -35)
+        pkt = b"\x02\x01\x06\x03\x03\xaa"\
               b"\xfe\x11\x16\xaa\xfe\x00\xe3\x12\x34\x56\x78\x90\x12\x34\x67\x89\x01\x00\x00\x00"\
               b"\x00\x00\x01\x00\x00\xdd"
-        scanner._mon.process_packet(pkt)
-        pkt = b"\x41\x3e\x41\x02\x01\x03\x01\x35\x94\xef\xcd\xd6\x1c\x19\x02\x01\x06\x03\x03\xaa"\
+        scanner._mon.process_packet(pkt, "1c:d6:cd:ef:94:35", -35)
+        pkt = b"\x02\x01\x06\x03\x03\xaa"\
               b"\xfe\x11\x16\xaa\xfe\x20\x00\x0b\x18\x13\x00\x00\x00\x14\x67\x00\x00\x2a\xc4\xe4"
-        scanner._mon.process_packet(pkt)
+        scanner._mon.process_packet(pkt, "1c:d6:cd:ef:94:35", -35)
         self.assertEqual(callback.call_count, 1)
 
     def test_multiple_filters2(self):
         callback = MagicMock()
         scanner = BeaconScanner(callback, device_filter=[EstimoteFilter(identifier="47a038d5eb032640", protocol_version=2), EddystoneFilter(instance="000000000001")],
             packet_filter=[EstimoteTelemetryFrameB, EddystoneUIDFrame])
-        pkt = b"\x41\x3e\x41\x02\x01\x03\x01\x35\x94\xef\xcd\xd6\x1c\x19\x02\x01\x04\x03\x03\x9a"\
+        pkt = b"\x02\x01\x04\x03\x03\x9a"\
               b"\xfe\x17\x16\x9a\xfe\x22\x47\xa0\x38\xd5\xeb\x03\x26\x40\x01\xff\xff\xff\xff\x49"\
               b"\x25\x66\xbc\x2e\x50\xdd"
-        scanner._mon.process_packet(pkt)
-        pkt = b"\x41\x3e\x41\x02\x01\x03\x01\x35\x94\xef\xcd\xd6\x1c\x19\x02\x01\x04\x03\x03\x9a"\
+        scanner._mon.process_packet(pkt, "1c:d6:cd:ef:94:35", -35)
+        pkt = b"\x02\x01\x04\x03\x03\x9a"\
               b"\xfe\x17\x16\x9a\xfe\x12\x47\xa0\x38\xd5\xeb\x03\x26\x40\x00\x00\x01\x41\x44\x47"\
               b"\xf0\x01\x00\x00\x00\xdd"
-        scanner._mon.process_packet(pkt)
-        pkt = b"\x41\x3e\x41\x02\x01\x03\x01\x35\x94\xef\xcd\xd6\x1c\x19\x02\x01\x06\x03\x03\xaa"\
+        scanner._mon.process_packet(pkt, "1c:d6:cd:ef:94:35", -35)
+        pkt = b"\x02\x01\x06\x03\x03\xaa"\
               b"\xfe\x11\x16\xaa\xfe\x00\xe3\x12\x34\x56\x78\x90\x12\x34\x67\x89\x01\x00\x00\x00"\
               b"\x00\x00\x01\x00\x00\xdd"
-        scanner._mon.process_packet(pkt)
-        pkt = b"\x41\x3e\x41\x02\x01\x03\x01\x35\x94\xef\xcd\xd6\x1c\x19\x02\x01\x06\x03\x03\xaa"\
+        scanner._mon.process_packet(pkt, "1c:d6:cd:ef:94:35", -35)
+        pkt = b"\x02\x01\x06\x03\x03\xaa"\
               b"\xfe\x11\x16\xaa\xfe\x00\xe3\x12\x34\x56\x78\x90\x12\x34\x67\x89\x01\x00\x00\x00"\
               b"\x00\x00\x02\x00\x00\xdd"
-        scanner._mon.process_packet(pkt)
-        pkt = b"\x41\x3e\x41\x02\x01\x03\x01\x35\x94\xef\xcd\xd6\x1c\x19\x02\x01\x06\x03\x03\xaa"\
+        scanner._mon.process_packet(pkt, "1c:d6:cd:ef:94:35", -35)
+        pkt = b"\x02\x01\x06\x03\x03\xaa"\
               b"\xfe\x11\x16\xaa\xfe\x00\xe3\x12\x34\x56\x78\x90\x12\x34\x67\x89\x01\x00\x00\x00"\
               b"\x00\x00\x01\x00\x00\xdd"
-        scanner._mon.process_packet(pkt)
+        scanner._mon.process_packet(pkt, "1c:d6:cd:ef:94:35", -35)
         self.assertEqual(callback.call_count, 3)
 
     def test_exposure_notification(self):
         callback = MagicMock()
         scanner = BeaconScanner(callback, packet_filter=[ExposureNotificationFrame])
         # Android and iOS seem to use slightly different packets
-        android_pkt = b"\x04\x3E\x28\x02\x01\x03\x01\xBB\x7E\xB5\x2B\x86\x79\x1C\x03\x03\x6F\xFD\x17\x16"\
+        android_pkt = b"\x03\x03\x6F\xFD\x17\x16"\
                       b"\x6F\xFD\x2C\xFB\x0D\xE0\x2B\x33\xD2\x0C\x5C\x27\x61\x12\x38\xE2\xD1\x07\x42\xB5"\
                       b"\x6E\xE5\xB8"
-        scanner._mon.process_packet(android_pkt)
-        ios_pkt = b"\x04\x3E\x2B\x02\x01\x03\x01\x08\xE6\xAE\x33\x0B\x3F\x1F\x02\x01\x1A\x03\x03\x6F"\
+        scanner._mon.process_packet(android_pkt, "1c:d6:cd:ef:94:35", -35)
+        ios_pkt = b"\x02\x01\x1A\x03\x03\x6F"\
                   b"\xFD\x17\x16\x6F\xFD\xE9\x32\xE8\xB0\x68\x8D\xFA\xEC\x00\x62\xB7\xD6\xD3\x5E\xEF"\
                   b"\xB5\xEE\xAA\x91\xAC\xBA"
-        scanner._mon.process_packet(ios_pkt)
+        scanner._mon.process_packet(ios_pkt, "1c:d6:cd:ef:94:35", -35)
         self.assertEqual(callback.call_count, 2)
 
 if __name__ == "__main__":

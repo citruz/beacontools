@@ -1,3 +1,4 @@
+"""Monitoring class for scanning using HCI (Linux, FreeBSD)"""
 from enum import IntEnum
 import struct
 
@@ -9,7 +10,8 @@ from .const import (EVT_LE_ADVERTISING_REPORT, LE_META_EVENT,
                     OCF_LE_SET_SCAN_PARAMETERS, OGF_LE_CTL,
                     OCF_LE_SET_EXT_SCAN_PARAMETERS, OCF_LE_SET_EXT_SCAN_ENABLE,
                     EVT_LE_EXT_ADVERTISING_REPORT, OGF_INFO_PARAM,
-                    OCF_READ_LOCAL_VERSION, EVT_CMD_COMPLETE)
+                    OCF_READ_LOCAL_VERSION, EVT_CMD_COMPLETE, ScanType, BluetoothAddressType,
+                    ScanFilter)
 from .monitor_base import MonitorBase
 from .utils import (bin_to_int, bt_addr_to_string, to_int)
 
@@ -147,8 +149,8 @@ class MonitorHci(MonitorBase):
                 window_fractions)
 
         send_cmd(self.socket, OGF_LE_CTL, command_field, scan_parameter_pkg)
-   
-    def toggle_scan(self, enable, filter_duplicates=False):
+
+    def toggle_scan(self, enable):
         """Enables or disables BLE scanning
 
         For extended set scan enable command additional parameters duration and period have
@@ -157,9 +159,8 @@ class MonitorHci(MonitorBase):
         page 1442 (LE Set Extended Scan Enable command).
 
         Args:
-            enable: boolean value to enable (True) or disable (False) scanner
-            filter_duplicates: boolean value to enable/disable filter, that
-                omits duplicated packets"""
+            enable: boolean value to enable (True) or disable (False) scanner"""
+        filter_duplicates=False
         if self.hci_version < HCIVersion.BT_CORE_SPEC_5_0:
             command_field = OCF_LE_SET_SCAN_ENABLE
             command = struct.pack("BB", enable, filter_duplicates)
