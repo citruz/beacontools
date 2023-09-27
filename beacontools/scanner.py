@@ -268,7 +268,7 @@ class Monitor(threading.Thread):
         if not self.kwtree.search(payload):
             return
 
-        bt_addr = bt_addr_to_string(pkt[7:13])
+        bt_addr = bt_addr_to_string(pkt[8:14])
         rssi = bin_to_int(pkt[-1] if self.hci_version < HCIVersion.BT_CORE_SPEC_5_0 else pkt[18])
         # strip bluetooth address and parse packet
         packet = parse_packet(payload)
